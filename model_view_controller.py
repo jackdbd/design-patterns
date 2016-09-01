@@ -13,6 +13,10 @@ class ItemAlreadyStored(Exception):
     pass
 
 
+class ItemNotYetStored(Exception):
+    pass
+
+
 class Model(object):
     """Model fetches the data to be presented from persistent storage.
     It's the business logic of the application.
@@ -53,16 +57,21 @@ class Model(object):
         else:
             return myitem
 
-    def insert_item(self, item):
+    def insert_item(self, item, price, quantity):
         myitem = self._items.get(item, None)
         if myitem is None:
-            # TODO: price and quantity must be set by the user
-            # TODO: if price and/or quantity are missing or wrong, we have to
-            # raise an exception
-            self._items[item] = {'price': 1.00, 'quantity': 1}
+            self._items[item] = {'price': price, 'quantity': quantity}
         else:
             raise ItemAlreadyStored('The {0} "{1}" is already in the {0} list.'
                                     .format(self.item_type, item))
+
+    def update_item(self, item, price, quantity):
+        myitem = self._items.get(item, None)
+        if myitem is None:
+            raise ItemNotYetStored(
+                'The {0} "{1}" is not yet stored in the {0} list, so it can\'t be updated'.format(self.item_type, item))
+        else:
+            self._items[item] = {'price': price, 'quantity': quantity}
 
 
 class View(object):
@@ -107,6 +116,14 @@ class View(object):
         print('***************************************************************')
 
     @staticmethod
+    def display_item_not_yet_stored_error(item, item_type, err):
+        print('***************************************************************')
+        print('We don\'t have any {} in our {} list. Please insert it first!'
+              .format(item.upper(), item_type))
+        print('{}'.format(err.args[0]))
+        print('***************************************************************')
+
+    @staticmethod
     def display_item_stored(item, item_type):
         print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('Hooray! We have just added some {} to our {} list!'
@@ -117,6 +134,15 @@ class View(object):
     def display_change_item_type(older, newer):
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
         print('Change item type from "{}" to "{}"'.format(older, newer))
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+
+    @staticmethod
+    def display_item_updated(item, o_price, o_quantity, n_price, n_quantity):
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+        print('Change {} price: {} --> {}'
+              .format(item, o_price, n_price))
+        print('Change {} quantity: {} --> {}'
+              .format(item, o_quantity, n_quantity))
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
 
 
@@ -151,16 +177,29 @@ class Controller(object):
         except MissingItemException as e:
             self.view.display_missing_item_error(item, e)
 
-    def insert_item(self, item):
+    def insert_item(self, item, price, quantity):
+        assert price > 0, 'price must be greater than 0'
+        assert quantity >= 0, 'quantity must be greater than or equal to 0'
         item_type = self.model.item_type
         try:
-            self.model.insert_item(item)
+            self.model.insert_item(item, price, quantity)
             self.view.display_item_stored(item, item_type)
             self.show_items()
         except ItemAlreadyStored as e:
             self.view.display_item_already_stored_error(item, item_type, e)
-        # TODO: exceptions to handle the cases where the item could be stored,
-        # but quantity/price are wrong.
+
+    def update_item(self, item, price, quantity):
+        assert price > 0, 'price must be greater than 0'
+        assert quantity >= 0, 'quantity must be greater than or equal to 0'
+        item_type = self.model.item_type
+
+        try:
+            older = self.model.get('milk')
+            self.model.update_item(item, price, quantity)
+            self.view.display_item_updated(
+                item, older['price'], older['quantity'], price, quantity)
+        except ItemNotYetStored as e:
+            self.view.display_item_not_yet_stored_error(item, item_type, e)
 
     def update_item_type(self, new_item_type):
         old_item_type = self.model.item_type
@@ -177,14 +216,15 @@ if __name__ == '__main__':
     c.show_items(bullet_points=True)
 
     c.show_item('milk')
-    c.insert_item('milk')
+    c.insert_item('milk', price=1.0, quantity=5)
 
     c.show_item('chocolate')
-    c.insert_item('chocolate')
+    c.insert_item('chocolate', price=2.0, quantity=10)
     c.show_item('chocolate')
 
     c.update_item_type('food')
     c.show_items()
+
+    c.update_item('ice cream', price=3.5, quantity=20)
+    c.update_item('milk', price=1.2, quantity=20)
     c.show_item('milk')
-    # c.update_quantity()
-    # c.update_price()
