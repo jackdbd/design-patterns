@@ -14,13 +14,12 @@ class ItemNotStored(Exception):
 
 
 class Model(object):
-    """Model fetches the data to be presented from persistent storage.
-    It's the business logic of the application.
-    Model is also responsible for working with the databases and performing
-    operations like Insertion, Update and Deletion.
-    Every model is meant to provide a certain kind of data to the controller,
-    when invoked.
+    """The Model class is the business logic of the application.
 
+    The Model class provides methods to access the data of the application and
+    performs CRUD operations. The data can be stored in the Model itself or in a
+    database. Only the Model can access the database. A Model never calls View's
+    methods.
     """
     def __init__(self):
         self._item_type = 'product'
@@ -71,11 +70,9 @@ class Model(object):
 
 
 class View(object):
-    """View deals with how the fetched data is presented to the user.
-    Select a template to display the results to the user's requests.
-    View, also referred as presentation layer, is responsible for displaying the
-    results obtained by the controller from the model component.
+    """The View class deals with how the data is presented to the user.
 
+    A View should never call its own methods. Only a Controller should do it.
     """
     @staticmethod
     def show_bullet_point_list(item_type, items):
@@ -143,14 +140,11 @@ class View(object):
 
 
 class Controller(object):
-    """Controller associates the user input to a Model and a View.
-    Controls user input and response back to the user.
-    Invokes a Model for the requested user inputs.
-    It's a middle man between user, business logic (Model) and formatting (View)
-    It's the entry point for all user's requests and inputs.
-    The controller accepts the user inputs, parses them and decides which type
-    of Model and View should be invoked.
+    """The Controller class associates the user input to a Model and a View.
 
+    The Controller class handles the user's inputs, invokes Model's methods to
+    alter the data, and calls specific View's methods to present the data back
+    to the user. Model and View should be initialized by the Controller.
     """
     def __init__(self, model, view):
         self.model = model
@@ -204,9 +198,7 @@ class Controller(object):
 
 
 if __name__ == '__main__':
-    m = Model()
-    v = View()
-    c = Controller(m, v)
+    c = Controller(Model(), View())
 
     c.show_items()
     c.show_items(bullet_points=True)
