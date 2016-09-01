@@ -11,5 +11,8 @@ venv/
 # ignore log files
 *.log
 
+# ignore database files
+*.db
+
 # ignore some OS generated files
 .DS_Store

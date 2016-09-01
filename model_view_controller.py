@@ -4,6 +4,9 @@ to separate internal representations of information (Model) from the ways that
 information is presented to (View) or accepted from (Controller) the user.
 """
 
+import dataset_backend
+import sqlite_backend
+
 
 class ItemAlreadyStored(Exception):
     pass
@@ -23,7 +26,44 @@ class Model(object):
     """
     def __init__(self):
         self._item_type = 'product'
-        self._items = {
+        # self._items = self.create_items()
+        # self._items = self.create_items_dataset()
+        self._items = self.create_items_sqlite3()
+
+    def create_items_sqlite3(self):
+        table = self.item_type
+        conn = sqlite_backend.create_db('mydb')
+        cursor = conn.cursor()
+        sqlite_backend.create_table(cursor, table)
+        sqlite_backend.insert_many(cursor, sqlite_backend.sample_items(), table)
+        # save (commit) the changes
+        conn.commit()
+        # before closing the connection we need to gather the result
+        sql = 'SELECT * FROM {} ORDER BY {}'.format(table, 'name')
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        # We got the data from the database, so we can close the connection
+        conn.close()
+        items = dict()
+        for item in results:
+            items[item[0]] = {'price': item[1], 'quantity': item[2]}
+        return items
+
+    def create_items_dataset(self):
+        db = dataset_backend.create_db()
+        table = dataset_backend.create_table(db, table_name=self.item_type)
+        response = dataset_backend.insert_sample_items(table)
+        # TODO: if response is ok go on, otherwise raise an Exception (specific
+        # for dataset or sqlite3)
+        items = dict()
+        for row in dataset_backend.get_all_records(table):
+            items[row['name']] = \
+                {'price': row['price'], 'quantity': row['quantity']}
+        return items
+
+    @staticmethod
+    def create_items():
+        return {
             'milk': {'price': 1.50, 'quantity': 10},
             'eggs': {'price': 0.20, 'quantity': 100},
             'cheese': {'price': 2.00, 'quantity': 10}
@@ -53,6 +93,7 @@ class Model(object):
             return myitem
 
     def insert_item(self, item, price, quantity):
+        # TODO: insert an item into the database, not in the _items dict
         myitem = self._items.get(item, None)
         if myitem is None:
             self._items[item] = {'price': price, 'quantity': quantity}
