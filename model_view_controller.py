@@ -22,23 +22,31 @@ class Model(object):
     when invoked.
 
     """
-    items = {
-        'milk': {'price': 1.50, 'quantity': 10},
-        'eggs': {'price': 0.20, 'quantity': 100},
-        'cheese': {'price': 2.00, 'quantity': 10}
-    }
+    def __init__(self):
+        self._item_type = 'product'
+        self._items = {
+            'milk': {'price': 1.50, 'quantity': 10},
+            'eggs': {'price': 0.20, 'quantity': 100},
+            'cheese': {'price': 2.00, 'quantity': 10}
+        }
 
-    item_type = 'product'
+    @property
+    def item_type(self):
+        return self._item_type
+
+    @item_type.setter
+    def item_type(self, new_item_type):
+        self._item_type = new_item_type
 
     def get_items_generator(self):
-        for item in self.items:
+        for item in self._items:
             yield item
 
     def get_items_list(self):
-        return [item for item in self.items]
+        return [item for item in self._items]
 
     def get(self, item):
-        myitem = self.items.get(item, None)
+        myitem = self._items.get(item, None)
         if myitem is None:
             raise MissingItemException(
                 'The {} "{}" is missing.'.format(self.item_type, item))
@@ -46,12 +54,12 @@ class Model(object):
             return myitem
 
     def insert_item(self, item):
-        myitem = self.items.get(item, None)
+        myitem = self._items.get(item, None)
         if myitem is None:
             # TODO: price and quantity must be set by the user
             # TODO: if price and/or quantity are missing or wrong, we have to
             # raise an exception
-            self.items[item] = {'price': 1.00, 'quantity': 1}
+            self._items[item] = {'price': 1.00, 'quantity': 1}
         else:
             raise ItemAlreadyStored('The {0} "{1}" is already in the {0} list.'
                                     .format(self.item_type, item))
