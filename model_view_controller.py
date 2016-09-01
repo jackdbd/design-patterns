@@ -5,15 +5,11 @@ information is presented to (View) or accepted from (Controller) the user.
 """
 
 
-class MissingItemException(Exception):
-    pass
-
-
 class ItemAlreadyStored(Exception):
     pass
 
 
-class ItemNotYetStored(Exception):
+class ItemNotStored(Exception):
     pass
 
 
@@ -52,8 +48,8 @@ class Model(object):
     def get(self, item):
         myitem = self._items.get(item, None)
         if myitem is None:
-            raise MissingItemException(
-                'The {} "{}" is missing.'.format(self.item_type, item))
+            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
+                                .format(self.item_type, item))
         else:
             return myitem
 
@@ -68,8 +64,8 @@ class Model(object):
     def update_item(self, item, price, quantity):
         myitem = self._items.get(item, None)
         if myitem is None:
-            raise ItemNotYetStored(
-                'The {0} "{1}" is not yet stored in the {0} list, so it can\'t be updated'.format(self.item_type, item))
+            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
+                                .format(self.item_type, item))
         else:
             self._items[item] = {'price': price, 'quantity': quantity}
 
@@ -174,7 +170,7 @@ class Controller(object):
             item_info = self.model.get(item)
             item_type = self.model.item_type
             self.view.show_item(item_type, item, item_info)
-        except MissingItemException as e:
+        except ItemNotStored as e:
             self.view.display_missing_item_error(item, e)
 
     def insert_item(self, item, price, quantity):
@@ -198,7 +194,7 @@ class Controller(object):
             self.model.update_item(item, price, quantity)
             self.view.display_item_updated(
                 item, older['price'], older['quantity'], price, quantity)
-        except ItemNotYetStored as e:
+        except ItemNotStored as e:
             self.view.display_item_not_yet_stored_error(item, item_type, e)
 
     def update_item_type(self, new_item_type):
