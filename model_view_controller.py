@@ -29,24 +29,19 @@ class Model(object):
         # self._items = self.create_items()
         # self._items = self.create_items_dataset()
         self._items = self.create_items_sqlite3()
+        # TODO: store db connection and db cursor?
 
     def create_items_sqlite3(self):
         table = self.item_type
-        conn = sqlite_backend.create_db('mydb')
-        cursor = conn.cursor()
-        sqlite_backend.create_table(cursor, table)
-        sqlite_backend.insert_many(cursor, sqlite_backend.sample_items(), table)
-        # save (commit) the changes
-        conn.commit()
-        # before closing the connection we need to gather the result
-        sql = 'SELECT * FROM {} ORDER BY {}'.format(table, 'name')
-        cursor.execute(sql)
-        results = cursor.fetchall()
+        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
+        sqlite_backend.create_table(table, conn)
+        sqlite_backend.insert_many(sqlite_backend.sample_items(), table, conn)
+        results = sqlite_backend.select_all(table, conn)
         # We got the data from the database, so we can close the connection
         conn.close()
         items = dict()
-        for item in results:
-            items[item[0]] = {'price': item[1], 'quantity': item[2]}
+        for res in results:
+            items[res[1]] = {'price': res[2], 'quantity': res[3]}
         return items
 
     def create_items_dataset(self):
@@ -81,9 +76,18 @@ class Model(object):
         for item in self._items:
             yield item
 
-    def get_items_list(self):
-        return [item for item in self._items]
+    # for the Model which uses a dictionary
+    # def get_items_list(self):
+    #     return [item for item in self._items]
 
+    # for the Model which uses a sqlite3 db
+    def get_items_list(self):
+        # TODO: get a DB connection from the model (maybe set connection as a @property)
+        table = self.item_type
+        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
+        return sqlite_backend.select_all(table, conn)
+
+    # TODO call select_one from db backend
     def get(self, item):
         myitem = self._items.get(item, None)
         if myitem is None:
@@ -93,14 +97,28 @@ class Model(object):
             return myitem
 
     def insert_item(self, item, price, quantity):
-        # TODO: insert an item into the database, not in the _items dict
-        myitem = self._items.get(item, None)
-        if myitem is None:
-            self._items[item] = {'price': price, 'quantity': quantity}
+        table = self._item_type
+        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
+        # TODO: get a DB connection from the Model
+        result = sqlite_backend.select_one(item, table, conn)
+        if result is None:
+            myitem = {'name': item, 'price': price, 'quantity': quantity}
+            sqlite_backend.insert_one(myitem, table, conn)
         else:
-            raise ItemAlreadyStored('The {0} "{1}" is already in the {0} list.'
-                                    .format(self.item_type, item))
+            raise ItemAlreadyStored(
+                'The {0} "{1}" is already in the {0} list.'
+                .format(self.item_type, item))
 
+    # this is for the dictionary
+    # def insert_item(self, item, price, quantity):
+    #     myitem = self._items.get(item, None)
+    #     if myitem is None:
+    #         self._items[item] = {'price': price, 'quantity': quantity}
+    #     else:
+    #         raise ItemAlreadyStored('The {0} "{1}" is already in the {0} list.'
+    #                                 .format(self.item_type, item))
+
+    # TODO call update_one from db backend
     def update_item(self, item, price, quantity):
         myitem = self._items.get(item, None)
         if myitem is None:
@@ -251,8 +269,9 @@ if __name__ == '__main__':
     c.insert_item('chocolate', price=2.0, quantity=10)
     c.show_item('chocolate')
 
-    c.update_item_type('food')
-    c.show_items()
+    # TODO: remove update item type from Controller, View, Model
+    # c.update_item_type('food')
+    # c.show_items()
 
     c.update_item('ice cream', price=3.5, quantity=20)
     c.update_item('milk', price=1.2, quantity=20)
