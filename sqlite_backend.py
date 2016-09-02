@@ -1,4 +1,7 @@
-"""Some tests with the db-sqlite3 module.
+"""SQLite backend (db-sqlite3).
+
+Each one of the CRUD operations should be able to open a database connection if
+there isn't already one available (check if there are any issues with this).
 
 Documentation:
 https://www.sqlite.org/datatype3.html
@@ -9,6 +12,11 @@ from sqlite3 import OperationalError, IntegrityError
 
 DB_name = 'myDB'
 # DB_name = ':memory:'  # in-memory database
+
+# TODO: check how to handle connections. Right now each CRUD operation can create
+# a db connection, but it doesn't close it. Maybe we'd like to keep the db
+# connection open if it is passed as argument, and close it only if it wasn't
+# passed (namely if we had to open it in the function itself).
 
 
 def connect_to_db(db=None):
@@ -41,7 +49,7 @@ def create_table(table_name, conn=None):
     sql = 'CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT,' \
           'name TEXT UNIQUE, price REAL, quantity INTEGER)'.format(table_name)
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     try:
         c.execute(sql)
@@ -54,7 +62,7 @@ def insert_one(item, table_name, conn=None):
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES ('{}', {}, {})"\
         .format(table_name, item['name'], item['price'], item['quantity'])
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     try:
         c.execute(sql)
@@ -67,7 +75,7 @@ def insert_many(items, table_name, conn=None):
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     entries = list()
     for x in items:
@@ -92,7 +100,7 @@ def select_one(item_name, table_name, conn=None):
 def select_all(table_name, conn=None):
     sql = 'SELECT * FROM {}'.format(table_name)
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     c.execute(sql)
     return c.fetchall()
@@ -102,7 +110,7 @@ def update_one(item, table_name, conn=None):
     sql = 'UPDATE {} SET price = {}, quantity={} WHERE name="{}"'\
         .format(table_name, item['price'], item['quantity'], item['name'])
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     c.execute(sql)
     conn.commit()
@@ -111,7 +119,7 @@ def update_one(item, table_name, conn=None):
 def delete_one(item_name, table_name, conn=None):
     sql = 'DELETE FROM {} WHERE name="{}"'.format(table_name, item_name)
     if conn is None:
-        conn = sqlite3.connect(database=DB_name)
+        conn = connect_to_db(DB_name)
     c = conn.cursor()
     c.execute(sql)
     conn.commit()
@@ -131,10 +139,9 @@ def sample_items():
 
 def main():
     conn = connect_to_db(DB_name)
-    # c = conn.cursor()
 
     # CREATE
-    create_table('items', conn=conn)
+    create_table('items')
     insert_one(sample_item(), table_name='items', conn=conn)
     insert_many(sample_items(), table_name='items', conn=conn)
     insert_one(sample_item(), table_name='items', conn=conn)
