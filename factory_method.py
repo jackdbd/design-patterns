@@ -1,22 +1,29 @@
 import random
 import inspect
+from abc import ABC, abstractmethod
 
 
-class Polygon(object):
+class Polygon(ABC):
     """Basic abstract class for polygons.
 
     Polygon (factory class) creates many different polygons (products) without
     exposing the instantiation logic to the client.
+    Trying to instantiate an object of a Polygon subclass without implementing
+    ALL abstract methods in the sublass itself will raise a TypeError exception.
     """
     def __str__(self):
         return '{} (perimeter: {}; area: {})'\
             .format(self.__class__.__name__, self.perimeter(), self.area())
 
+    @abstractmethod
     def perimeter(self):
-        raise NotImplementedError('Implement in subclass')
+        """Compute the perimeter of the polygon. Implement in subclass."""
+        pass
 
+    @abstractmethod
     def area(self):
-        raise NotImplementedError('Implement in subclass')
+        """Compute the area of the polygon. Implement in subclass."""
+        pass
 
     @staticmethod
     def factory_method(vertices):
