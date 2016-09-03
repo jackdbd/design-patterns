@@ -4,7 +4,7 @@ to separate internal representations of information (Model) from the ways that
 information is presented to (View) or accepted from (Controller) the user.
 """
 import basic_backend
-import dataset_backend
+# import dataset_backend  # TODO
 import sqlite_backend
 import mvc_exceptions as mvc_exc
 import mvc_mock_objects as mock
@@ -29,29 +29,29 @@ class Model(object):
     def item_type(self, new_item_type):
         self._item_type = new_item_type
 
-    def create_item(self):
+    def create_item(self, name, price, quantity):
         raise NotImplementedError('Implement in subclass')
 
-    def create_items(self):
+    def create_items(self, items):
         raise NotImplementedError('Implement in subclass')
 
-    def read_item(self):
+    def read_item(self, name):
         raise NotImplementedError('Implement in subclass')
 
     def read_items(self):
         raise NotImplementedError('Implement in subclass')
 
-    def update_item(self):
+    def update_item(self, name, price, quantity):
         raise NotImplementedError('Implement in subclass')
 
-    def delete_item(self):
+    def delete_item(self, name):
         raise NotImplementedError('Implement in subclass')
 
 
 class ModelBasic(Model):
 
     def __init__(self, application_items):
-        super(ModelBasic, self).__init__()
+        super().__init__()
         self.create_items(application_items)
 
     def create_item(self, name, price, quantity):
@@ -76,7 +76,7 @@ class ModelBasic(Model):
 class ModelSQLite(Model):
 
     def __init__(self, application_items):
-        super(ModelSQLite, self).__init__()
+        super().__init__()
         # TODO: store db connection in a property
         sqlite_backend.create_table(self._item_type)
         self.create_items(application_items)
