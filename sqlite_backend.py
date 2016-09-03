@@ -9,14 +9,26 @@ https://docs.python.org/3/library/sqlite3.html
 """
 import sqlite3
 from sqlite3 import OperationalError, IntegrityError
+import mvc_exceptions as mvc_exc
+import mvc_mock_objects as mock
+
 
 DB_name = 'myDB'
 # DB_name = ':memory:'  # in-memory database
 
-# TODO: check how to handle connections. Right now each CRUD operation can create
-# a db connection, but it doesn't close it. Maybe we'd like to keep the db
-# connection open if it is passed as argument, and close it only if it wasn't
+# TODO: check how to handle connections. Right now each CRUD operation can
+# create a db connection, but it doesn't close it. Maybe we'd like to keep the
+# db connection open if it is passed as argument, and close it only if it wasn't
 # passed (namely if we had to open it in the function itself).
+
+
+def tuple_to_dict(mytuple):
+    mydict = dict()
+    mydict['id'] = mytuple[0]
+    mydict['name'] = mytuple[1]
+    mydict['price'] = mytuple[2]
+    mydict['quantity'] = mytuple[3]
+    return mydict
 
 
 def connect_to_db(db=None):
@@ -58,9 +70,9 @@ def create_table(table_name, conn=None):
         print(e)
 
 
-def insert_one(item, table_name, conn=None):
+def insert_one(name, price, quantity, table_name, conn=None):
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES ('{}', {}, {})"\
-        .format(table_name, item['name'], item['price'], item['quantity'])
+        .format(table_name, name, price, quantity)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
@@ -68,7 +80,8 @@ def insert_one(item, table_name, conn=None):
         c.execute(sql)
         conn.commit()
     except IntegrityError as e:
-        print('{}: {} already stored in {}'.format(e, item['name'], table_name))
+        raise mvc_exc.ItemAlreadyStored(
+            '{}: "{}" already stored in table "{}"'.format(e, name, table_name))
 
 
 def insert_many(items, table_name, conn=None):
@@ -84,7 +97,7 @@ def insert_many(items, table_name, conn=None):
         c.executemany(sql, entries)
         conn.commit()
     except IntegrityError as e:
-        print('{}: at least one in {} was already stored in {}'
+        print('{}: at least one in {} was already stored in table "{}"'
               .format(e, [x['name'] for x in items], table_name))
 
 
@@ -94,7 +107,13 @@ def select_one(item_name, table_name, conn=None):
         conn = connect_to_db(DB_name)
     c = conn.cursor()
     c.execute(sql)
-    return c.fetchone()
+    result = c.fetchone()
+    if result is not None:
+        return tuple_to_dict(result)
+    else:
+        raise mvc_exc.ItemNotStored(
+            'Can\'t read "{}" because it\'s not stored in table "{}"'
+            .format(item_name, table_name))
 
 
 def select_all(table_name, conn=None):
@@ -103,65 +122,81 @@ def select_all(table_name, conn=None):
         conn = connect_to_db(DB_name)
     c = conn.cursor()
     c.execute(sql)
-    return c.fetchall()
+    results = c.fetchall()
+    return list(map(lambda x: tuple_to_dict(x), results))
 
 
-def update_one(item, table_name, conn=None):
-    sql = 'UPDATE {} SET price = {}, quantity={} WHERE name="{}"'\
-        .format(table_name, item['price'], item['quantity'], item['name'])
+def update_one(name, price, quantity, table_name, conn=None):
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name="{}" LIMIT 1)'\
+        .format(table_name, name)
+    sql_update = 'UPDATE {} SET price = {}, quantity={} WHERE name="{}"'\
+        .format(table_name, price, quantity, name)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
-    c.execute(sql)
-    conn.commit()
+    c.execute(sql_check)
+    result = c.fetchone()
+    if result[0]:
+        c.execute(sql_update)
+        conn.commit()
+    else:
+        raise mvc_exc.ItemNotStored(
+            'Can\'t update "{}" because it\'s not stored in table "{}"'
+            .format(name, table_name))
 
 
-def delete_one(item_name, table_name, conn=None):
-    sql = 'DELETE FROM {} WHERE name="{}"'.format(table_name, item_name)
+def delete_one(name, table_name, conn=None):
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name="{}" LIMIT 1)'\
+        .format(table_name, name)
+    sql_delete = 'DELETE FROM {} WHERE name="{}"'.format(table_name, name)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
-    c.execute(sql)
-    conn.commit()
-
-
-def sample_item():
-    return {'name': 'milk', 'price': 1.5, 'quantity': 4}
-
-
-def sample_items():
-    return [
-        {'name': 'bread', 'price': 0.5, 'quantity': 20},
-        {'name': 'eggs', 'price': 0.2, 'quantity': 100},
-        {'name': 'cheese', 'price': 2.5, 'quantity': 20},
-    ]
-
+    c.execute(sql_check)
+    result = c.fetchone()
+    if result[0]:
+        c.execute(sql_delete)
+        conn.commit()
+    else:
+        raise mvc_exc.ItemNotStored(
+            'Can\'t delete "{}" because it\'s not stored in table "{}"'
+            .format(name, table_name))
 
 def main():
+
     conn = connect_to_db(DB_name)
     create_table('items')
 
     # CREATE
-    insert_one(sample_item(), table_name='items', conn=conn)
-    insert_many(sample_items(), table_name='items', conn=conn)
-    insert_one(sample_item(), table_name='items', conn=conn)
+    insert_many(mock.items(), table_name='items', conn=conn)
+    insert_one('beer', price=2.0, quantity=5, table_name='items', conn=conn)
+    # if we try to insert an object already stored we get an ItemAlreadyStored
+    # exception
+    # insert_one('milk', price=1.0, quantity=3, table_name='items', conn=conn)
 
     # READ
     print('SELECT milk')
     print(select_one('milk', table_name='items', conn=conn))
     print('SELECT all')
     print(select_all(table_name='items', conn=conn))
+    # if we try to select an object not stored we get an ItemNotStored exception
+    # print(select_one('pizza', table_name='items', conn=conn))
 
     # UPDATE
     print('UPDATE bread, SELECT bread')
-    update_one({'name': 'bread', 'price': 1.5, 'quantity': 5},
-               table_name='items', conn=conn)
+    update_one('bread', price=1.5, quantity=5, table_name='items', conn=conn)
     print(select_one('bread', table_name='items', conn=conn))
+    # if we try to update an object not stored we get an ItemNotStored exception
+    # print('UPDATE pizza')
+    # update_one('pizza', price=1.5, quantity=5, table_name='items', conn=conn)
 
     # DELETE
-    print('DELETE milk, SELECT all')
-    delete_one('milk', table_name='items', conn=conn)
+    print('DELETE beer, SELECT all')
+    delete_one('beer', table_name='items', conn=conn)
     print(select_all(table_name='items', conn=conn))
+    # if we try to delete an object not stored we get an ItemNotStored exception
+    # print('DELETE fish')
+    # delete_one('fish', table_name='items', conn=conn)
 
     # save (commit) the changes
     # conn.commit()

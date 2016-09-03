@@ -6,20 +6,20 @@ information is presented to (View) or accepted from (Controller) the user.
 import basic_backend
 import dataset_backend
 import sqlite_backend
+import mvc_exceptions as mvc_exc
+import mvc_mock_objects as mock
 
 
-class ItemAlreadyStored(Exception):
-    pass
+class Model(object):
+    """The Model class is the business logic of the application.
 
-
-class ItemNotStored(Exception):
-    pass
-
-
-class ModelAbstract(object):
+    The Model class provides methods to access the data of the application and
+    performs CRUD operations. The data can be stored in the Model itself or in a
+    database. Only the Model can access the database. A Model never calls View's
+    methods.
+    """
     def __init__(self):
         self._item_type = 'product'
-        self._items = self.create_items()
 
     @property
     def item_type(self):
@@ -48,136 +48,58 @@ class ModelAbstract(object):
         raise NotImplementedError('Implement in subclass')
 
 
-class ModelBasic(ModelAbstract):
+class ModelBasic(Model):
 
-    def create_item(self):
-        pass
+    def __init__(self, application_items):
+        super(ModelBasic, self).__init__()
+        self.create_items(application_items)
 
-    def create_items(self):
-        return basic_backend.create_items()
+    def create_item(self, name, price, quantity):
+        basic_backend.create_item(name, price, quantity)
 
-    def read_item(self, item):
-        myitem = self._items.get(item, None)
-        if myitem is None:
-            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
-                                .format(self.item_type, item))
-        else:
-            return myitem
+    def create_items(self, items):
+        basic_backend.create_items(items)
+
+    def read_item(self, name):
+        return basic_backend.read_item(name)
 
     def read_items(self):
         return basic_backend.read_items()
 
+    def update_item(self, name, price, quantity):
+        basic_backend.update_item(name, price, quantity)
 
-class Model(object):
-    """The Model class is the business logic of the application.
+    def delete_item(self, name):
+        basic_backend.delete_item(name)
 
-    The Model class provides methods to access the data of the application and
-    performs CRUD operations. The data can be stored in the Model itself or in a
-    database. Only the Model can access the database. A Model never calls View's
-    methods.
-    """
-    def __init__(self):
-        self._item_type = 'product'
-        self._items = self.create_items()
-        # self._items = self.create_items_dataset()
-        # self._items = self.create_items_sqlite3()
-        # TODO: store db connection and db cursor?
 
-    def create_items_sqlite3(self):
-        table = self.item_type
-        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
-        sqlite_backend.create_table(table, conn)
-        sqlite_backend.insert_many(sqlite_backend.sample_items(), table, conn)
-        results = sqlite_backend.select_all(table, conn)
-        # We got the data from the database, so we can close the connection
-        conn.close()
-        items = dict()
-        for res in results:
-            items[res[1]] = {'price': res[2], 'quantity': res[3]}
-        return items
+class ModelSQLite(Model):
 
-    def create_items_dataset(self):
-        db = dataset_backend.create_db()
-        table = dataset_backend.create_table(db, table_name=self.item_type)
-        response = dataset_backend.insert_sample_items(table)
-        # TODO: if response is ok go on, otherwise raise an Exception (specific
-        # for dataset or sqlite3)
-        items = dict()
-        for row in dataset_backend.get_all_records(table):
-            items[row['name']] = \
-                {'price': row['price'], 'quantity': row['quantity']}
-        return items
+    def __init__(self, application_items):
+        super(ModelSQLite, self).__init__()
+        # TODO: store db connection in a property
+        sqlite_backend.create_table(self._item_type)
+        self.create_items(application_items)
 
-    def create_items(self):
-        return basic_backend.create_items()
-        # return {
-        #     'milk': {'price': 1.50, 'quantity': 10},
-        #     'eggs': {'price': 0.20, 'quantity': 100},
-        #     'cheese': {'price': 2.00, 'quantity': 10}
-        # }
+    def create_item(self, name, price, quantity):
+        sqlite_backend.insert_one(
+            name, price, quantity, table_name=self.item_type)
 
-    @property
-    def item_type(self):
-        return self._item_type
+    def create_items(self, items):
+        sqlite_backend.insert_many(items, table_name=self.item_type)
 
-    @item_type.setter
-    def item_type(self, new_item_type):
-        self._item_type = new_item_type
+    def read_item(self, name):
+        return sqlite_backend.select_one(name, table_name=self.item_type)
 
-    def get_items_generator(self):
-        for item in self._items:
-            yield item
+    def read_items(self):
+        return sqlite_backend.select_all(table_name=self.item_type)
 
-    # for the Model which uses a dictionary
-    # def get_items_list(self):
-    #     return [item for item in self._items]
+    def update_item(self, name, price, quantity):
+        sqlite_backend.update_one(
+            name, price, quantity, table_name=self.item_type)
 
-    # for the Model which uses a sqlite3 db
-    def get_items_list(self):
-        # TODO: get a DB connection from the model (maybe set connection as a @property)
-        table = self.item_type
-        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
-        return sqlite_backend.select_all(table, conn)
-
-    # TODO call select_one from db backend
-    def get(self, item):
-        myitem = self._items.get(item, None)
-        if myitem is None:
-            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
-                                .format(self.item_type, item))
-        else:
-            return myitem
-
-    def insert_item(self, item, price, quantity):
-        table = self._item_type
-        conn = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
-        # TODO: get a DB connection from the Model
-        result = sqlite_backend.select_one(item, table, conn)
-        if result is None:
-            myitem = {'name': item, 'price': price, 'quantity': quantity}
-            sqlite_backend.insert_one(myitem, table, conn)
-        else:
-            raise ItemAlreadyStored(
-                'The {0} "{1}" is already in the {0} list.'
-                .format(self.item_type, item))
-
-    # this is for the dictionary
-    # def insert_item(self, item, price, quantity):
-    #     myitem = self._items.get(item, None)
-    #     if myitem is None:
-    #         self._items[item] = {'price': price, 'quantity': quantity}
-    #     else:
-    #         raise ItemAlreadyStored('The {0} "{1}" is already in the {0} list.'
-    #                                 .format(self.item_type, item))
-
-    # TODO call update_one from db backend
-    def update_item(self, item, price, quantity):
-        myitem = self._items.get(item, None)
-        if myitem is None:
-            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
-                                .format(self.item_type, item))
-        else:
-            self._items[item] = {'price': price, 'quantity': quantity}
+    def delete_item(self, name):
+        sqlite_backend.delete_one(name, table_name=self.item_type)
 
 
 class View(object):
@@ -249,6 +171,12 @@ class View(object):
               .format(item, o_quantity, n_quantity))
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
 
+    @staticmethod
+    def display_item_deletion(name):
+        print('---------------------------------------------------------------')
+        print('We have just removed {} from our list'.format(name))
+        print('---------------------------------------------------------------')
+
 
 class Controller(object):
     """The Controller class associates the user input to a Model and a View.
@@ -270,61 +198,74 @@ class Controller(object):
         else:
             self.view.show_number_point_list(item_type, items)
 
-    def show_item(self, item):
+    def show_item(self, item_name):
         try:
-            item_info = self.model.read_item(item)
+            item = self.model.read_item(item_name)
             item_type = self.model.item_type
-            self.view.show_item(item_type, item, item_info)
-        except ItemNotStored as e:
-            self.view.display_missing_item_error(item, e)
+            self.view.show_item(item_type, item_name, item)
+        except mvc_exc.ItemNotStored as e:
+            self.view.display_missing_item_error(item_name, e)
 
-    def insert_item(self, item, price, quantity):
+    def insert_item(self, name, price, quantity):
         assert price > 0, 'price must be greater than 0'
         assert quantity >= 0, 'quantity must be greater than or equal to 0'
         item_type = self.model.item_type
         try:
-            self.model.insert_item(item, price, quantity)
-            self.view.display_item_stored(item, item_type)
-            self.show_items()
-        except ItemAlreadyStored as e:
-            self.view.display_item_already_stored_error(item, item_type, e)
+            self.model.create_item(name, price, quantity)
+            self.view.display_item_stored(name, item_type)
+        except mvc_exc.ItemAlreadyStored as e:
+            self.view.display_item_already_stored_error(name, item_type, e)
 
-    def update_item(self, item, price, quantity):
+    def update_item(self, name, price, quantity):
         assert price > 0, 'price must be greater than 0'
         assert quantity >= 0, 'quantity must be greater than or equal to 0'
         item_type = self.model.item_type
 
         try:
-            older = self.model.get('milk')
-            self.model.update_item(item, price, quantity)
+            older = self.model.read_item(name)
+            self.model.update_item(name, price, quantity)
             self.view.display_item_updated(
-                item, older['price'], older['quantity'], price, quantity)
-        except ItemNotStored as e:
-            self.view.display_item_not_yet_stored_error(item, item_type, e)
+                name, older['price'], older['quantity'], price, quantity)
+        except mvc_exc.ItemNotStored as e:
+            self.view.display_item_not_yet_stored_error(name, item_type, e)
+            # if the item is not yet stored and we performed an update, we have
+            # 2 options: do nothing or call insert_item to add it.
+            # self.insert_item(name, price, quantity)
 
     def update_item_type(self, new_item_type):
         old_item_type = self.model.item_type
         self.model.item_type = new_item_type
         self.view.display_change_item_type(old_item_type, new_item_type)
 
+    def delete_item(self, name):
+        item_type = self.model.item_type
+        try:
+            self.model.delete_item(name)
+            self.view.display_item_deletion(name)
+        except mvc_exc.ItemNotStored as e:
+            self.view.display_item_not_yet_stored_error(name, item_type, e)
+
 
 if __name__ == '__main__':
-    c = Controller(ModelBasic(), View())
+
+    myitems = mock.items()
+
+    # c = Controller(ModelBasic(myitems), View())
+    c = Controller(ModelSQLite(myitems), View())
 
     c.show_items()
     c.show_items(bullet_points=True)
-
-    c.show_item('milk')
-    c.insert_item('milk', price=1.0, quantity=5)
-
     c.show_item('chocolate')
+    c.show_item('bread')
+
+    c.insert_item('bread', price=1.0, quantity=5)
     c.insert_item('chocolate', price=2.0, quantity=10)
     c.show_item('chocolate')
 
-    # TODO: remove update item type from Controller, View, Model
-    # c.update_item_type('food')
-    # c.show_items()
-
-    c.update_item('ice cream', price=3.5, quantity=20)
     c.update_item('milk', price=1.2, quantity=20)
-    c.show_item('milk')
+    c.update_item('ice cream', price=3.5, quantity=20)
+
+    c.delete_item('fish')
+    c.delete_item('bread')
+
+    c.show_items()

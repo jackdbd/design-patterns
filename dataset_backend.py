@@ -3,6 +3,8 @@
 https://dataset.readthedocs.io/en/latest/
 """
 import dataset
+import mvc_exceptions as mvc_exc
+
 
 INSERT_SUCCESS = 1
 INSERT_FAIL = 0
