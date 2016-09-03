@@ -3,7 +3,7 @@ MVC divides a given software application into three interconnected parts, so as
 to separate internal representations of information (Model) from the ways that
 information is presented to (View) or accepted from (Controller) the user.
 """
-
+import basic_backend
 import dataset_backend
 import sqlite_backend
 
@@ -16,6 +16,58 @@ class ItemNotStored(Exception):
     pass
 
 
+class ModelAbstract(object):
+    def __init__(self):
+        self._item_type = 'product'
+        self._items = self.create_items()
+
+    @property
+    def item_type(self):
+        return self._item_type
+
+    @item_type.setter
+    def item_type(self, new_item_type):
+        self._item_type = new_item_type
+
+    def create_item(self):
+        raise NotImplementedError('Implement in subclass')
+
+    def create_items(self):
+        raise NotImplementedError('Implement in subclass')
+
+    def read_item(self):
+        raise NotImplementedError('Implement in subclass')
+
+    def read_items(self):
+        raise NotImplementedError('Implement in subclass')
+
+    def update_item(self):
+        raise NotImplementedError('Implement in subclass')
+
+    def delete_item(self):
+        raise NotImplementedError('Implement in subclass')
+
+
+class ModelBasic(ModelAbstract):
+
+    def create_item(self):
+        pass
+
+    def create_items(self):
+        return basic_backend.create_items()
+
+    def read_item(self, item):
+        myitem = self._items.get(item, None)
+        if myitem is None:
+            raise ItemNotStored('The {0} "{1}" is not stored in the {0} list'
+                                .format(self.item_type, item))
+        else:
+            return myitem
+
+    def read_items(self):
+        return basic_backend.read_items()
+
+
 class Model(object):
     """The Model class is the business logic of the application.
 
@@ -26,9 +78,9 @@ class Model(object):
     """
     def __init__(self):
         self._item_type = 'product'
-        # self._items = self.create_items()
+        self._items = self.create_items()
         # self._items = self.create_items_dataset()
-        self._items = self.create_items_sqlite3()
+        # self._items = self.create_items_sqlite3()
         # TODO: store db connection and db cursor?
 
     def create_items_sqlite3(self):
@@ -56,13 +108,13 @@ class Model(object):
                 {'price': row['price'], 'quantity': row['quantity']}
         return items
 
-    @staticmethod
-    def create_items():
-        return {
-            'milk': {'price': 1.50, 'quantity': 10},
-            'eggs': {'price': 0.20, 'quantity': 100},
-            'cheese': {'price': 2.00, 'quantity': 10}
-        }
+    def create_items(self):
+        return basic_backend.create_items()
+        # return {
+        #     'milk': {'price': 1.50, 'quantity': 10},
+        #     'eggs': {'price': 0.20, 'quantity': 100},
+        #     'cheese': {'price': 2.00, 'quantity': 10}
+        # }
 
     @property
     def item_type(self):
@@ -211,7 +263,7 @@ class Controller(object):
 
     def show_items(self, bullet_points=False):
         # items = self.model.get_items_generator()
-        items = self.model.get_items_list()
+        items = self.model.read_items()
         item_type = self.model.item_type
         if bullet_points:
             self.view.show_bullet_point_list(item_type, items)
@@ -220,7 +272,7 @@ class Controller(object):
 
     def show_item(self, item):
         try:
-            item_info = self.model.get(item)
+            item_info = self.model.read_item(item)
             item_type = self.model.item_type
             self.view.show_item(item_type, item, item_info)
         except ItemNotStored as e:
@@ -257,7 +309,7 @@ class Controller(object):
 
 
 if __name__ == '__main__':
-    c = Controller(Model(), View())
+    c = Controller(ModelBasic(), View())
 
     c.show_items()
     c.show_items(bullet_points=True)

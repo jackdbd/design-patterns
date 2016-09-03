@@ -139,9 +139,9 @@ def sample_items():
 
 def main():
     conn = connect_to_db(DB_name)
+    create_table('items')
 
     # CREATE
-    create_table('items')
     insert_one(sample_item(), table_name='items', conn=conn)
     insert_many(sample_items(), table_name='items', conn=conn)
     insert_one(sample_item(), table_name='items', conn=conn)
