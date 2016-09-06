@@ -5,133 +5,152 @@ complexity facing inwards if it makes the external interface simpler.
 
 
 # Complex parts
-class _UserInterface(object):
+class _IgnitionSystem(object):
+
+    @staticmethod
+    def produce_spark():
+        return True
+
+
+class _Engine(object):
 
     def __init__(self):
-        print('Welcome to Big Money Bank!')
-        print('Please insert your card and digit your security pin...\n')
+        self.revs_per_minute = 0
 
-    @staticmethod
-    def display_pin_error_message():
-        print('We\'re sorry, the pin you entered is wrong!\n')
+    def turnon(self):
+        self.revs_per_minute = 2000
 
-    @classmethod
-    def welcome_owner(cls, owner, cash):
-        print('Hi {}!'.format(owner))
-        print('What can we do for you?'.format(owner))
-        cls.display_current_balance(cash)
-
-    @staticmethod
-    def display_transaction_successful():
-        print('Transaction successful')
-
-    @staticmethod
-    def display_transaction_unsuccessful(amout):
-        print('Sorry, you can\'t widraw ${}\n'.format(amout))
-
-    @staticmethod
-    def display_current_balance(cash):
-        print('Your current balance is: ${}\n'.format(cash))
-
-    @staticmethod
-    def display_withdrawal(amount):
-        print('Withdraw ${}'.format(amount))
-
-    @staticmethod
-    def display_deposit(amount):
-        print('Deposit ${}'.format(amount))
+    def turnoff(self):
+        self.revs_per_minute = 0
 
 
-class _AccountManager(object):
-
-    def __init__(self):
-        self._mapping = {
-            '1234': {'number': 'A1b23cz567', 'owner': 'John', 'cash': 1000.0},
-            '5678': {'number': 'N1b73t893y', 'owner': 'Tom', 'cash': 500.0},
-        }
-        self.pin = None
+class _FuelTank(object):
+    def __init__(self, level=30):
+        self._level = level
 
     @property
-    def mapping(self):
-        return self._mapping
+    def level(self):
+        return self._level
 
-    @mapping.setter
-    def mapping(self, mapping):
-        self._mapping = mapping
+    @level.setter
+    def level(self, level):
+        self._level = level
 
-    def is_pin_valid(self, pin):
-        if pin in self.mapping.keys():
-            return True
+
+class _DashBoardLight(object):
+
+    def __init__(self, is_on=False):
+        self._is_on = is_on
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    @property
+    def is_on(self):
+        return self._is_on
+
+    @is_on.setter
+    def is_on(self, status):
+        self._is_on = status
+
+    def status_check(self):
+        if self._is_on:
+            print('{}: ON'.format(str(self)))
         else:
-            return False
+            print('{}: OFF'.format(str(self)))
 
-    def get_account(self, pin):
-        assert pin in self.mapping, 'No accounts with Pin = {}!'.format(pin)
-        account = self.mapping[pin]
-        return account['number'], account['owner'], account['cash']
 
-    def get_current_cash(self):
-        return self.mapping[self.pin]['cash']
+class _HandBrakeLight(_DashBoardLight):
+    pass
 
-    def enough_cash_in_account(self, amount_to_withdraw):
-        account = self.mapping[self.pin]
-        if amount_to_withdraw <= account['cash']:
-            return True
-        else:
-            return False
 
-    def increase_cash_in_account(self, amount_deposited):
-        account = self.mapping[self.pin]
-        account['cash'] += amount_deposited
+class _FogLampLight(_DashBoardLight):
+    pass
 
-    def decrease_cash_in_account(self, amount_withdrawn):
-        account = self.mapping[self.pin]
-        account['cash'] -= amount_withdrawn
+
+class _Dashboard(object):
+
+    def __init__(self):
+        self.lights = {'handbreak': _HandBrakeLight(), 'fog': _FogLampLight()}
+
+    def show(self):
+        for light in self.lights.values():
+            light.status_check()
 
 
 # Facade
-class ATM(object):
-
+class Car(object):
     def __init__(self):
-        self.ui = _UserInterface()
-        self.account_manager = _AccountManager()
+        self.ignition_system = _IgnitionSystem()
+        self.engine = _Engine()
+        self.fuel_tank = _FuelTank()
+        self.dashboard = _Dashboard()
 
-    def digit_pin(self, pin):
-        if self.account_manager.is_pin_valid(pin):
-            self.account_manager.pin = pin
-            account_number, owner, cash = \
-                self.account_manager.get_account(pin)
-            self.ui.welcome_owner(owner, cash)
+    @property
+    def km_per_litre(self):
+        return 17.0
+
+    def consume_fuel(self, km):
+        litres = min(self.fuel_tank.level, km / self.km_per_litre)
+        self.fuel_tank.level -= litres
+
+    def start(self):
+        print('\nStarting...')
+        self.dashboard.show()
+        if self.ignition_system.produce_spark():
+            self.engine.turnon()
         else:
-            self.ui.display_pin_error_message()
+            print('Can\'t start. Faulty ignition system')
 
-    def withdraw_cash(self, amount):
-        assert amount > 0, 'The amount of cash to withdraw must be positive'
-        self.ui.display_withdrawal(amount)
-        if self.account_manager.enough_cash_in_account(amount):
-            self.account_manager.decrease_cash_in_account(amount)
-            self.ui.display_transaction_successful()
-            cash = self.account_manager.get_current_cash()
-            self.ui.display_current_balance(cash)
+    def has_enough_fuel(self, km, km_per_litre):
+        litres_needed = km / km_per_litre
+        if self.fuel_tank.level > litres_needed:
+            return True
         else:
-            self.ui.display_transaction_unsuccessful(amount)
+            return False
 
-    def deposit_cash(self, amount):
-        assert amount > 0, 'The amount of cash to deposit must be positive'
-        self.ui.display_deposit(amount)
-        self.account_manager.increase_cash_in_account(amount)
-        self.ui.display_transaction_successful()
-        cash = self.account_manager.get_current_cash()
-        self.ui.display_current_balance(cash)
+    def drive(self, km=100):
+        print('\n')
+        if self.engine.revs_per_minute > 0:
+            while self.has_enough_fuel(km, self.km_per_litre):
+                self.consume_fuel(km)
+                print('Drove {}km'.format(km))
+                print('{:.2f}l of fuel still left'.format(self.fuel_tank.level))
+        else:
+            print('Can\'t drive. The Engine is turned off!')
+
+    def park(self):
+        print('\nParking...')
+        self.dashboard.lights['handbreak'].is_on = True
+        self.dashboard.show()
+        self.engine.turnoff()
+
+    def switch_fog_lights(self, status):
+        print('\nSwitching {} fog lights...'.format(status))
+        boolean = True if status == 'ON' else False
+        self.dashboard.lights['fog'].is_on = boolean
+        self.dashboard.show()
+
+    def fill_up_tank(self):
+        print('\nFuel tank filled up!')
+        self.fuel_tank.level = 100
 
 
+# the main function is the Client
 def main():
-    atm = ATM()
-    atm.digit_pin('1234')
-    atm.withdraw_cash(500.0)
-    atm.withdraw_cash(600.0)
-    atm.deposit_cash(200.0)
-    atm.withdraw_cash(600.0)
+    car = Car()
+    car.start()
+    car.drive()
+
+    car.switch_fog_lights('ON')
+    car.switch_fog_lights('OFF')
+
+    car.park()
+    car.fill_up_tank()
+    car.drive()
+
+    car.start()
+    car.drive()
 
 if __name__ == '__main__':
     main()
