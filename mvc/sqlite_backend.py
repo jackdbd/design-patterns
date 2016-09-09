@@ -31,6 +31,20 @@ def tuple_to_dict(mytuple):
     return mydict
 
 
+def scrub(input_string):
+    """Clean an input string (to prevent SQL injection).
+
+    Parameters
+    ----------
+    input_string : str
+
+    Returns
+    -------
+    str
+    """
+    return ''.join(k for k in input_string if k.isalnum())
+
+
 def connect_to_db(db=None):
     """Connect to a sqlite DB. Create the database if there isn't one yet.
 
@@ -58,6 +72,7 @@ def connect_to_db(db=None):
 
 
 def create_table(table_name, conn=None):
+    table_name = scrub(table_name)
     sql = 'CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT,' \
           'name TEXT UNIQUE, price REAL, quantity INTEGER)'.format(table_name)
     if conn is None:
@@ -71,13 +86,14 @@ def create_table(table_name, conn=None):
 
 
 def insert_one(name, price, quantity, table_name, conn=None):
-    sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES ('{}', {}, {})"\
-        .format(table_name, name, price, quantity)
+    table_name = scrub(table_name)
+    sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
+        .format(table_name)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
     try:
-        c.execute(sql)
+        c.execute(sql, (name, price, quantity))
         conn.commit()
     except IntegrityError as e:
         raise mvc_exc.ItemAlreadyStored(
@@ -85,6 +101,7 @@ def insert_one(name, price, quantity, table_name, conn=None):
 
 
 def insert_many(items, table_name, conn=None):
+    table_name = scrub(table_name)
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
     if conn is None:
@@ -102,6 +119,8 @@ def insert_many(items, table_name, conn=None):
 
 
 def select_one(item_name, table_name, conn=None):
+    table_name = scrub(table_name)
+    item_name = scrub(item_name)
     sql = 'SELECT * FROM {} WHERE name="{}"'.format(table_name, item_name)
     if conn is None:
         conn = connect_to_db(DB_name)
@@ -117,6 +136,7 @@ def select_one(item_name, table_name, conn=None):
 
 
 def select_all(table_name, conn=None):
+    table_name = scrub(table_name)
     sql = 'SELECT * FROM {}'.format(table_name)
     if conn is None:
         conn = connect_to_db(DB_name)
@@ -127,17 +147,18 @@ def select_all(table_name, conn=None):
 
 
 def update_one(name, price, quantity, table_name, conn=None):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name="{}" LIMIT 1)'\
-        .format(table_name, name)
-    sql_update = 'UPDATE {} SET price = {}, quantity={} WHERE name="{}"'\
-        .format(table_name, price, quantity, name)
+    table_name = scrub(table_name)
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name=? LIMIT 1)'\
+        .format(table_name)
+    sql_update = 'UPDATE {} SET price=?, quantity=? WHERE name=?'\
+        .format(table_name)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
-    c.execute(sql_check)
+    c.execute(sql_check, (name,))  # we need the comma
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_update)
+        c.execute(sql_update, (price, quantity, name))
         conn.commit()
     else:
         raise mvc_exc.ItemNotStored(
@@ -146,21 +167,24 @@ def update_one(name, price, quantity, table_name, conn=None):
 
 
 def delete_one(name, table_name, conn=None):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name="{}" LIMIT 1)'\
-        .format(table_name, name)
-    sql_delete = 'DELETE FROM {} WHERE name="{}"'.format(table_name, name)
+    table_name = scrub(table_name)
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name=? LIMIT 1)'\
+        .format(table_name)
+    table_name = scrub(table_name)
+    sql_delete = 'DELETE FROM {} WHERE name=?'.format(table_name)
     if conn is None:
         conn = connect_to_db(DB_name)
     c = conn.cursor()
-    c.execute(sql_check)
+    c.execute(sql_check, (name,))  # we need the comma
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_delete)
+        c.execute(sql_delete, (name,))  # we need the comma
         conn.commit()
     else:
         raise mvc_exc.ItemNotStored(
             'Can\'t delete "{}" because it\'s not stored in table "{}"'
             .format(name, table_name))
+
 
 def main():
 
