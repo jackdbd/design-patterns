@@ -65,8 +65,10 @@ def connect_to_db(db=None):
     """
     if db is None:
         mydb = ':memory:'
+        print('New connection to in-memory SQLite DB...')
     else:
         mydb = '{}.db'.format(db)
+        print('New connection to SQLite DB...')
     connection = sqlite3.connect(mydb)
     return connection
 
@@ -188,8 +190,10 @@ def delete_one(name, table_name, conn=None):
 
 def main():
 
-    conn = connect_to_db(DB_name)
-    create_table('items')
+    conn = connect_to_db()
+
+    table_name = 'items'
+    create_table(table_name, conn=conn)
 
     # CREATE
     insert_many(mock.items(), table_name='items', conn=conn)

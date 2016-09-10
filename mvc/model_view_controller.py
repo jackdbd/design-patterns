@@ -4,8 +4,8 @@ to separate internal representations of information (Model) from the ways that
 information is presented to (View) or accepted from (Controller) the user.
 """
 import basic_backend
-# import dataset_backend  # TODO
 import sqlite_backend
+import dataset_backend
 import mvc_exceptions as mvc_exc
 import mvc_mock_objects as mock
 
@@ -51,7 +51,8 @@ class Model(object):
 class ModelBasic(Model):
 
     def __init__(self, application_items):
-        super().__init__()
+        # super().__init__()  # ok in Python 3.x, not in 2.x
+        super(self.__class__, self).__init__()  # also ok in Python 2.x
         self.create_items(application_items)
 
     def create_item(self, name, price, quantity):
@@ -76,7 +77,8 @@ class ModelBasic(Model):
 class ModelSQLite(Model):
 
     def __init__(self, application_items):
-        super().__init__()
+        # super().__init__()  # ok in Python 3.x, not in 2.x
+        super(self.__class__, self).__init__()  # also ok in Python 2.x
         # TODO: store db connection in a property
         sqlite_backend.create_table(self._item_type)
         self.create_items(application_items)
@@ -100,6 +102,37 @@ class ModelSQLite(Model):
 
     def delete_item(self, name):
         sqlite_backend.delete_one(name, table_name=self.item_type)
+
+
+################################################################################
+class ModelDataset(Model):
+
+    def __init__(self, application_items):
+        # super().__init__()  # ok in Python 3.x, not in 2.x
+        super(self.__class__, self).__init__()  # also ok in Python 2.x
+        dataset_backend.create_table(self._item_type)
+        self.create_items(application_items)
+
+    def create_item(self, name, price, quantity):
+        dataset_backend.insert_one(
+            name, price, quantity, table_name=self.item_type)
+
+    def create_items(self, items):
+        dataset_backend.insert_many(items, table_name=self.item_type)
+
+    def read_item(self, name):
+        return dataset_backend.select_one(name, table_name=self.item_type)
+
+    def read_items(self):
+        return dataset_backend.select_all(table_name=self.item_type)
+
+    def update_item(self, name, price, quantity):
+        dataset_backend.update_one(
+            name, price, quantity, table_name=self.item_type)
+
+    def delete_item(self, name):
+        dataset_backend.delete_one(name, table_name=self.item_type)
+################################################################################
 
 
 class View(object):
@@ -251,7 +284,8 @@ if __name__ == '__main__':
     myitems = mock.items()
 
     # c = Controller(ModelBasic(myitems), View())
-    c = Controller(ModelSQLite(myitems), View())
+    # c = Controller(ModelSQLite(myitems), View())
+    c = Controller(ModelDataset(myitems), View())
 
     c.show_items()
     c.show_items(bullet_points=True)
