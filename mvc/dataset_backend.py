@@ -11,32 +11,53 @@ import mvc_mock_objects as mock
 DB_name = 'myDB'
 
 
-def connect_to_db(db_name=None):
+class UnsupportedDatabaseEngine(Exception):
+    pass
+
+
+def connect_to_db(db_name=None, db_engine='sqlite'):
     """Connect to a database. Create the database if there isn't one yet.
 
     The database can be a SQLite DB (either a DB file or an in-memory DB), or a
-    PostgreSQL DB.
+    PostgreSQL DB. In order to connect to a PostgreSQL DB you have first to
+    create a database, create a user, and finally grant him all necessary
+    privileges on that database and tables.
+    'postgresql://<username>:<password>@localhost:<PostgreSQL port>/<db name>'
     Note: at the moment it looks it's not possible to close a connection
     manually (e.g. like calling conn.close() in sqlite3).
+
 
     Parameters
     ----------
     db_name : str or None
-        database name (without file extension .db). If None, a SQLite in-memory
-        database will be used.
+        database name (without file extension .db)
+    db_engine : str
+        database engine ('sqlite' or 'postgres')
 
     Returns
     -------
     dataset.persistence.database.Database
         connection to a database
     """
-    # TODO: connection to PostgreSQL
+    engines = {'sqlite', 'postgres'}
     if db_name is None:
         db_string = 'sqlite:///:memory:'
         print('New connection to in-memory SQLite DB...')
     else:
-        db_string = 'sqlite:///{}.db'.format(db_name)
-        print('New connection to SQLite DB...')
+        if db_engine == 'sqlite':
+            db_string = 'sqlite:///{}.db'.format(DB_name)
+            print('New connection to SQLite DB...')
+        elif db_engine == 'postgres':
+            db_string = \
+                'postgresql://test_user:test_password@localhost:5432/testdb'
+            # db_string = \
+            #     'postgresql://test_user2:test_password2@localhost:5432/testdb'
+            print('New connection to PostgreSQL DB...')
+        else:
+            raise UnsupportedDatabaseEngine(
+                'No database engine with this name. '
+                'Choose one of the following: {}'.format(engines))
+
     return dataset.connect(db_string)
 
 
