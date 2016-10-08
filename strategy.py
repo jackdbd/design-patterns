@@ -5,11 +5,7 @@ be selected at runtime. We can implement it by creating a common (abstract)
 interface and subclassing it with a new class for each strategy, how it's done
 in [1], or by creating a single class and replacing a method of that class with
 a different function, how it's done in [2]. The latter implementation is
-possible because Python supports higher-order functions.
-
-[1] http://python-3-patterns-idioms-test.readthedocs.io/en/latest/
-FunctionObjects.html
-[2] http://stackoverflow.com/a/964033
+possible because in Python functions are first class objects.
 """
 import types
 
