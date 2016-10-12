@@ -18,7 +18,7 @@ DB_name = 'myDB'
 
 
 def connect(func):
-    """Decorator to (re)open a database connection when needed.
+    """Decorator to (re)open a sqlite database connection when needed.
 
     A database connection must be open when we want to perform a database query
     but we are in one of the following situations:
@@ -44,7 +44,10 @@ def connect(func):
         if conns:
             conn = conns[0]
         else:
-            conn = kwargs['conn']
+            if 'conn' in kwargs.keys():
+                conn = kwargs['conn']
+            else:
+                conn = None
         try:
             # I don't know if this is the simplest and fastest query to try
             conn.execute(

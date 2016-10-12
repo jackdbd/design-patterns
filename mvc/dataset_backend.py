@@ -15,6 +15,28 @@ class UnsupportedDatabaseEngine(Exception):
     pass
 
 
+def connect(func):
+    """Decorator to (re)open a database connection when needed.
+
+    Parameters
+    ----------
+    func : function
+        function which performs the database query
+
+    Returns
+    -------
+    inner func : function
+    """
+    def inner_func(*args, **kwargs):
+        # First of all we need to find the connection object. It might be either
+        # in args or kwargs.
+        conns = list(filter(lambda x: type(x) is dataset.Database, args))
+        if not conns and not 'conn' in kwargs.keys():
+            connect_to_db(DB_name)
+        return func(*args, **kwargs)
+    return inner_func
+
+
 def connect_to_db(db_name=None, db_engine='sqlite'):
     """Connect to a database. Create the database if there isn't one yet.
 
@@ -61,6 +83,7 @@ def connect_to_db(db_name=None, db_engine='sqlite'):
     return dataset.connect(db_string)
 
 
+@connect
 def create_table(table_name, conn=None):
     """Load a table or create it if it doesn't exist yet.
 
@@ -77,8 +100,6 @@ def create_table(table_name, conn=None):
     table_name : str
     conn : dataset.persistence.database.Database
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
     try:
         conn.load_table(table_name)
     except NoSuchTableError as e:
@@ -87,6 +108,7 @@ def create_table(table_name, conn=None):
         print('Created table {} on database {}'.format(table_name, DB_name))
 
 
+@connect
 def insert_one(name, price, quantity, table_name, conn=None):
     """Insert a single item in a table.
 
@@ -102,9 +124,6 @@ def insert_one(name, price, quantity, table_name, conn=None):
     ------
     mvc_exc.ItemAlreadyStored: if the record is already stored in the table.
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     try:
         table.insert(dict(name=name, price=price, quantity=quantity))
@@ -114,6 +133,7 @@ def insert_one(name, price, quantity, table_name, conn=None):
             .format(name, table.table.name, e))
 
 
+@connect
 def insert_many(items, table_name, conn=None):
     """Insert all items in a table.
 
@@ -125,9 +145,6 @@ def insert_many(items, table_name, conn=None):
     conn : dataset.persistence.database.Database
     """
     # TODO: check what happens if 1+ records can be inserted but 1 fails
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     try:
         for x in items:
@@ -139,6 +156,7 @@ def insert_many(items, table_name, conn=None):
               .format([x['name'] for x in items], table.table.name, e))
 
 
+@connect
 def select_one(name, table_name, conn=None):
     """Select a single item in a table.
 
@@ -155,9 +173,6 @@ def select_one(name, table_name, conn=None):
     ------
     mvc_exc.ItemNotStored: if the record is not stored in the table.
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     row = table.find_one(name=name)
     if row is not None:
@@ -168,6 +183,7 @@ def select_one(name, table_name, conn=None):
             .format(name, table.table.name))
 
 
+@connect
 def select_all(table_name, conn=None):
     """Select all items in a table.
 
@@ -183,14 +199,12 @@ def select_all(table_name, conn=None):
     list
         list of dictionaries. Each dict is a record.
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     rows = table.all()
     return list(map(lambda x: dict(x), rows))
 
 
+@connect
 def update_one(name, price, quantity, table_name, conn=None):
     """Update a single item in the table.
 
@@ -211,9 +225,6 @@ def update_one(name, price, quantity, table_name, conn=None):
     ------
     mvc_exc.ItemNotStored: if the record is not stored in the table.
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     row = table.find_one(name=name)
     if row is not None:
@@ -225,6 +236,7 @@ def update_one(name, price, quantity, table_name, conn=None):
             .format(name, table.table.name))
 
 
+@connect
 def delete_one(item_name, table_name, conn=None):
     """Delete a single item in a table.
 
@@ -238,9 +250,6 @@ def delete_one(item_name, table_name, conn=None):
     ------
     mvc_exc.ItemNotStored: if the record is not stored in the table.
     """
-    if conn is None:
-        conn = connect_to_db(DB_name)
-
     table = conn.load_table(table_name)
     row = table.find_one(name=item_name)
     if row is not None:
