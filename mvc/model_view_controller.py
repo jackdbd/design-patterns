@@ -79,29 +79,43 @@ class ModelSQLite(Model):
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
-        # TODO: store db connection in a property
-        sqlite_backend.create_table(self._item_type)
+        self._connection = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
+        sqlite_backend.create_table(self._item_type, self.connection)
         self.create_items(application_items)
+
+    @property
+    def connection(self):
+        return self._connection
+
+    @connection.setter
+    def connection(self, new_connection):
+        self._connection = new_connection
 
     def create_item(self, name, price, quantity):
         sqlite_backend.insert_one(
-            name, price, quantity, table_name=self.item_type)
+            name, price, quantity, table_name=self.item_type,
+            conn=self.connection)
 
     def create_items(self, items):
-        sqlite_backend.insert_many(items, table_name=self.item_type)
+        sqlite_backend.insert_many(
+            items, table_name=self.item_type, conn=self.connection)
 
     def read_item(self, name):
-        return sqlite_backend.select_one(name, table_name=self.item_type)
+        return sqlite_backend.select_one(
+            name, table_name=self.item_type, conn=self.connection)
 
     def read_items(self):
-        return sqlite_backend.select_all(table_name=self.item_type)
+        return sqlite_backend.select_all(
+            table_name=self.item_type, conn=self.connection)
 
     def update_item(self, name, price, quantity):
         sqlite_backend.update_one(
-            name, price, quantity, table_name=self.item_type)
+            name, price, quantity, table_name=self.item_type,
+            conn=self.connection)
 
     def delete_item(self, name):
-        sqlite_backend.delete_one(name, table_name=self.item_type)
+        sqlite_backend.delete_one(
+            name, table_name=self.item_type, conn=self.connection)
 
 
 ################################################################################
@@ -303,3 +317,10 @@ if __name__ == '__main__':
     c.delete_item('bread')
 
     c.show_items()
+
+    # we close the current sqlite database connection explicitly
+    if type(c.model) is ModelSQLite:
+        sqlite_backend.disconnect_from_db(
+            sqlite_backend.DB_name, c.model.connection)
+        # the sqlite backend understands that it needs to open a new connection
+        c.show_items()
