@@ -121,10 +121,9 @@ def create_table(table_name, conn=None):
     table_name = scrub(table_name)
     sql = 'CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT,' \
           'name TEXT UNIQUE, price REAL, quantity INTEGER)'.format(table_name)
-    c = conn.cursor()
     try:
-        c.execute(sql)
-        conn.commit()  # is it really needed?
+        conn.execute(sql)
+        conn.commit()  # is it really needed if we just create a table?
     except OperationalError as e:
         print(e)
 
@@ -134,9 +133,8 @@ def insert_one(name, price, quantity, table_name, conn=None):
     table_name = scrub(table_name)
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
-    c = conn.cursor()
     try:
-        c.execute(sql, (name, price, quantity))
+        conn.execute(sql, (name, price, quantity))
         conn.commit()
     except IntegrityError as e:
         raise mvc_exc.ItemAlreadyStored(
@@ -148,12 +146,11 @@ def insert_many(items, table_name, conn=None):
     table_name = scrub(table_name)
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
-    c = conn.cursor()
     entries = list()
     for x in items:
         entries.append((x['name'], x['price'], x['quantity']))
     try:
-        c.executemany(sql, entries)
+        conn.executemany(sql, entries)
         conn.commit()
     except IntegrityError as e:
         print('{}: at least one in {} was already stored in table "{}"'
@@ -165,8 +162,7 @@ def select_one(item_name, table_name, conn=None):
     table_name = scrub(table_name)
     item_name = scrub(item_name)
     sql = 'SELECT * FROM {} WHERE name="{}"'.format(table_name, item_name)
-    c = conn.cursor()
-    c.execute(sql)
+    c = conn.execute(sql)
     result = c.fetchone()
     if result is not None:
         return tuple_to_dict(result)
@@ -180,8 +176,7 @@ def select_one(item_name, table_name, conn=None):
 def select_all(table_name, conn=None):
     table_name = scrub(table_name)
     sql = 'SELECT * FROM {}'.format(table_name)
-    c = conn.cursor()
-    c.execute(sql)
+    c = conn.execute(sql)
     results = c.fetchall()
     return list(map(lambda x: tuple_to_dict(x), results))
 
@@ -193,8 +188,7 @@ def update_one(name, price, quantity, table_name, conn=None):
         .format(table_name)
     sql_update = 'UPDATE {} SET price=?, quantity=? WHERE name=?'\
         .format(table_name)
-    c = conn.cursor()
-    c.execute(sql_check, (name,))  # we need the comma
+    c = conn.execute(sql_check, (name,))  # we need the comma
     result = c.fetchone()
     if result[0]:
         c.execute(sql_update, (price, quantity, name))
@@ -212,8 +206,7 @@ def delete_one(name, table_name, conn=None):
         .format(table_name)
     table_name = scrub(table_name)
     sql_delete = 'DELETE FROM {} WHERE name=?'.format(table_name)
-    c = conn.cursor()
-    c.execute(sql_check, (name,))  # we need the comma
+    c = conn.execute(sql_check, (name,))  # we need the comma
     result = c.fetchone()
     if result[0]:
         c.execute(sql_delete, (name,))  # we need the comma
