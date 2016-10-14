@@ -80,7 +80,7 @@ class ModelSQLite(Model):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
         self._connection = sqlite_backend.connect_to_db(sqlite_backend.DB_name)
-        sqlite_backend.create_table(self._item_type, self.connection)
+        sqlite_backend.create_table(self.connection, self._item_type)
         self.create_items(application_items)
 
     @property
@@ -89,29 +89,27 @@ class ModelSQLite(Model):
 
     def create_item(self, name, price, quantity):
         sqlite_backend.insert_one(
-            name, price, quantity, table_name=self.item_type,
-            conn=self.connection)
+            self.connection, name, price, quantity, table_name=self.item_type)
 
     def create_items(self, items):
         sqlite_backend.insert_many(
-            items, table_name=self.item_type, conn=self.connection)
+            self.connection, items, table_name=self.item_type)
 
     def read_item(self, name):
         return sqlite_backend.select_one(
-            name, table_name=self.item_type, conn=self.connection)
+            self.connection, name, table_name=self.item_type)
 
     def read_items(self):
         return sqlite_backend.select_all(
-            table_name=self.item_type, conn=self.connection)
+            self.connection, table_name=self.item_type)
 
     def update_item(self, name, price, quantity):
         sqlite_backend.update_one(
-            name, price, quantity, table_name=self.item_type,
-            conn=self.connection)
+            self.connection, name, price, quantity, table_name=self.item_type)
 
     def delete_item(self, name):
         sqlite_backend.delete_one(
-            name, table_name=self.item_type, conn=self.connection)
+            self.connection, name, table_name=self.item_type)
 
 
 ################################################################################
@@ -120,8 +118,9 @@ class ModelDataset(Model):
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
-        self._connection = dataset_backend.connect_to_db(dataset_backend.DB_name)
-        dataset_backend.create_table(self._item_type, self.connection)
+        self._connection = dataset_backend.connect_to_db(
+            dataset_backend.DB_name)
+        dataset_backend.create_table(self.connection, self._item_type)
         self.create_items(application_items)
 
     @property
@@ -130,29 +129,27 @@ class ModelDataset(Model):
 
     def create_item(self, name, price, quantity):
         dataset_backend.insert_one(
-            name, price, quantity, table_name=self.item_type,
-            conn=self.connection)
+            self.connection, name, price, quantity, table_name=self.item_type)
 
     def create_items(self, items):
         dataset_backend.insert_many(
-            items, table_name=self.item_type, conn=self.connection)
+            self.connection, items, table_name=self.item_type)
 
     def read_item(self, name):
         return dataset_backend.select_one(
-            name, table_name=self.item_type, conn=self.connection)
+            self.connection, name, table_name=self.item_type)
 
     def read_items(self):
         return dataset_backend.select_all(
-            table_name=self.item_type, conn=self.connection)
+            self.connection, table_name=self.item_type)
 
     def update_item(self, name, price, quantity):
         dataset_backend.update_one(
-            name, price, quantity, table_name=self.item_type,
-            conn=self.connection)
+            self.connection, name, price, quantity, table_name=self.item_type)
 
     def delete_item(self, name):
         dataset_backend.delete_one(
-            name, table_name=self.item_type, conn=self.connection)
+            self.connection, name, table_name=self.item_type)
 ################################################################################
 
 

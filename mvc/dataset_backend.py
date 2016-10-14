@@ -15,28 +15,6 @@ class UnsupportedDatabaseEngine(Exception):
     pass
 
 
-def connect(func):
-    """Decorator to (re)open a database connection when needed.
-
-    Parameters
-    ----------
-    func : function
-        function which performs the database query
-
-    Returns
-    -------
-    inner func : function
-    """
-    def inner_func(*args, **kwargs):
-        # First of all we need to find the connection object. It might be either
-        # in args or kwargs.
-        conns = list(filter(lambda x: type(x) is dataset.Database, args))
-        if not conns and not 'conn' in kwargs.keys():
-            connect_to_db(DB_name)
-        return func(*args, **kwargs)
-    return inner_func
-
-
 def connect_to_db(db_name=None, db_engine='sqlite'):
     """Connect to a database. Create the database if there isn't one yet.
 
@@ -83,8 +61,7 @@ def connect_to_db(db_name=None, db_engine='sqlite'):
     return dataset.connect(db_string)
 
 
-@connect
-def create_table(table_name, conn=None):
+def create_table(conn, table_name):
     """Load a table or create it if it doesn't exist yet.
 
     The function load_table can only load a table if exist, and raises a
@@ -108,8 +85,7 @@ def create_table(table_name, conn=None):
         print('Created table {} on database {}'.format(table_name, DB_name))
 
 
-@connect
-def insert_one(name, price, quantity, table_name, conn=None):
+def insert_one(conn, name, price, quantity, table_name):
     """Insert a single item in a table.
 
     Parameters
@@ -133,8 +109,7 @@ def insert_one(name, price, quantity, table_name, conn=None):
             .format(name, table.table.name, e))
 
 
-@connect
-def insert_many(items, table_name, conn=None):
+def insert_many(conn, items, table_name):
     """Insert all items in a table.
 
     Parameters
@@ -156,8 +131,7 @@ def insert_many(items, table_name, conn=None):
               .format([x['name'] for x in items], table.table.name, e))
 
 
-@connect
-def select_one(name, table_name, conn=None):
+def select_one(conn, name, table_name):
     """Select a single item in a table.
 
     The dataset library returns a result as an OrderedDict.
@@ -183,8 +157,7 @@ def select_one(name, table_name, conn=None):
             .format(name, table.table.name))
 
 
-@connect
-def select_all(table_name, conn=None):
+def select_all(conn, table_name):
     """Select all items in a table.
 
     The dataset library returns results as OrderedDicts.
@@ -204,8 +177,7 @@ def select_all(table_name, conn=None):
     return list(map(lambda x: dict(x), rows))
 
 
-@connect
-def update_one(name, price, quantity, table_name, conn=None):
+def update_one(conn, name, price, quantity, table_name):
     """Update a single item in the table.
 
     Note: dataset update method is a bit counterintuitive to use. Read the docs
@@ -236,8 +208,7 @@ def update_one(name, price, quantity, table_name, conn=None):
             .format(name, table.table.name))
 
 
-@connect
-def delete_one(item_name, table_name, conn=None):
+def delete_one(conn, item_name, table_name):
     """Delete a single item in a table.
 
     Parameters
@@ -265,38 +236,38 @@ def main():
     conn = connect_to_db()
 
     table_name = 'items'
-    create_table(table_name, conn=conn)
+    create_table(conn, table_name)
 
     # CREATE
-    insert_many(items=mock.items(), table_name=table_name, conn=conn)
-    insert_one('beer', price=2.0, quantity=5, table_name=table_name, conn=conn)
+    insert_many(conn, items=mock.items(), table_name=table_name)
+    insert_one(conn, 'beer', price=2.0, quantity=5, table_name=table_name)
     # if we try to insert an object already stored we get an ItemAlreadyStored
     # exception
-    # insert_one('beer', 2.0, 5, table_name=table_name, conn=conn)
+    # insert_one(conn, 'beer', 2.0, 5, table_name=table_name)
 
     # READ
     print('SELECT milk')
-    print(select_one('milk', table_name=table_name, conn=conn))
+    print(select_one(conn, 'milk', table_name=table_name))
     print('SELECT all')
-    print(select_all(table_name=table_name, conn=conn))
+    print(select_all(conn, table_name=table_name))
     # if we try to select an object not stored we get an ItemNotStored exception
-    # print(select_one('pizza', table_name=table_name, conn=conn))
+    # print(select_one(conn, 'pizza', table_name=table_name))
 
     # UPDATE
     print('UPDATE bread, SELECT bread')
-    update_one('bread', price=1.5, quantity=5, table_name=table_name, conn=conn)
-    print(select_one('bread', table_name=table_name, conn=conn))
+    update_one(conn, 'bread', price=1.5, quantity=5, table_name=table_name)
+    print(select_one(conn, 'bread', table_name=table_name))
     # if we try to update an object not stored we get an ItemNotStored exception
     # print('UPDATE pizza')
-    # update_one('pizza', 9.5, 5, table_name=table_name, conn=conn)
+    # update_one(conn, 'pizza', 9.5, 5, table_name=table_name)
 
     # DELETE
     print('DELETE beer, SELECT all')
-    delete_one('beer', table_name=table_name, conn=conn)
-    print(select_all(table_name=table_name, conn=conn))
+    delete_one(conn, 'beer', table_name=table_name)
+    print(select_all(conn, table_name=table_name))
     # if we try to delete an object not stored we get an ItemNotStored exception
     # print('DELETE fish')
-    # delete_one('fish', table_name=table_name, conn=conn)
+    # delete_one(conn, 'fish', table_name=table_name)
 
 if __name__ == '__main__':
     main()

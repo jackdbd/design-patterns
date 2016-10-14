@@ -17,70 +17,6 @@ DB_name = 'myDB'
 # DB_name = ':memory:'  # in-memory database
 
 
-def connect(func):
-    """Decorator to (re)open a sqlite database connection when needed.
-
-    A database connection must be open when we want to perform a database query
-    but we are in one of the following situations:
-    1) there connection is None (no connection)
-    2) the connection is closed
-    We can understand in which scenario we are by executing a simple query in a
-    try/except block. If the connection is None we will catch an AttributeError.
-    If the connection is closed we will catch a sqlite3.ProgrammingError.
-
-    Parameters
-    ----------
-    func : function
-        function which performs the database query
-
-    Returns
-    -------
-    inner func : function
-    """
-    def inner_func(*args, **kwargs):
-        # First of all we need to find the connection object. It might be either
-        # in args or kwargs.
-        conns = list(filter(lambda x: type(x) is sqlite3.Connection, args))
-        if conns:
-            conn = conns[0]
-        else:
-            if 'conn' in kwargs.keys():
-                conn = kwargs['conn']
-            else:
-                conn = None
-        try:
-            # I don't know if this is the simplest and fastest query to try
-            conn.execute(
-                'SELECT name FROM sqlite_temp_master WHERE type="table";')
-        except (AttributeError, ProgrammingError) as e:
-            kwargs['conn'] = connect_to_db(DB_name)
-        return func(*args, **kwargs)
-    return inner_func
-
-
-def tuple_to_dict(mytuple):
-    mydict = dict()
-    mydict['id'] = mytuple[0]
-    mydict['name'] = mytuple[1]
-    mydict['price'] = mytuple[2]
-    mydict['quantity'] = mytuple[3]
-    return mydict
-
-
-def scrub(input_string):
-    """Clean an input string (to prevent SQL injection).
-
-    Parameters
-    ----------
-    input_string : str
-
-    Returns
-    -------
-    str
-    """
-    return ''.join(k for k in input_string if k.isalnum())
-
-
 def connect_to_db(db=None):
     """Connect to a sqlite DB. Create the database if there isn't one yet.
 
@@ -109,6 +45,59 @@ def connect_to_db(db=None):
     return connection
 
 
+# TODO: use this decorator to wrap commit/rollback in a try/except block ?
+# see http://www.kylev.com/2009/05/22/python-decorators-and-database-idioms/
+def connect(func):
+    """Decorator to (re)open a sqlite database connection when needed.
+
+    A database connection must be open when we want to perform a database query
+    but we are in one of the following situations:
+    1) there is no connection
+    2) the connection is closed
+
+    Parameters
+    ----------
+    func : function
+        function which performs the database query
+
+    Returns
+    -------
+    inner func : function
+    """
+    def inner_func(conn, *args, **kwargs):
+        try:
+            # I don't know if this is the simplest and fastest query to try
+            conn.execute(
+                'SELECT name FROM sqlite_temp_master WHERE type="table";')
+        except (AttributeError, ProgrammingError):
+            conn = connect_to_db(DB_name)
+        return func(conn, *args, **kwargs)
+    return inner_func
+
+
+def tuple_to_dict(mytuple):
+    mydict = dict()
+    mydict['id'] = mytuple[0]
+    mydict['name'] = mytuple[1]
+    mydict['price'] = mytuple[2]
+    mydict['quantity'] = mytuple[3]
+    return mydict
+
+
+def scrub(input_string):
+    """Clean an input string (to prevent SQL injection).
+
+    Parameters
+    ----------
+    input_string : str
+
+    Returns
+    -------
+    str
+    """
+    return ''.join(k for k in input_string if k.isalnum())
+
+
 def disconnect_from_db(db=None, conn=None):
     if db is not DB_name:
         print("You are trying to disconnect from a wrong DB")
@@ -117,7 +106,7 @@ def disconnect_from_db(db=None, conn=None):
 
 
 @connect
-def create_table(table_name, conn=None):
+def create_table(conn, table_name):
     table_name = scrub(table_name)
     sql = 'CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT,' \
           'name TEXT UNIQUE, price REAL, quantity INTEGER)'.format(table_name)
@@ -129,7 +118,7 @@ def create_table(table_name, conn=None):
 
 
 @connect
-def insert_one(name, price, quantity, table_name, conn=None):
+def insert_one(conn, name, price, quantity, table_name):
     table_name = scrub(table_name)
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
@@ -142,7 +131,7 @@ def insert_one(name, price, quantity, table_name, conn=None):
 
 
 @connect
-def insert_many(items, table_name, conn=None):
+def insert_many(conn, items, table_name):
     table_name = scrub(table_name)
     sql = "INSERT INTO {} ('name', 'price', 'quantity') VALUES (?, ?, ?)"\
         .format(table_name)
@@ -158,7 +147,7 @@ def insert_many(items, table_name, conn=None):
 
 
 @connect
-def select_one(item_name, table_name, conn=None):
+def select_one(conn, item_name, table_name):
     table_name = scrub(table_name)
     item_name = scrub(item_name)
     sql = 'SELECT * FROM {} WHERE name="{}"'.format(table_name, item_name)
@@ -173,7 +162,7 @@ def select_one(item_name, table_name, conn=None):
 
 
 @connect
-def select_all(table_name, conn=None):
+def select_all(conn, table_name):
     table_name = scrub(table_name)
     sql = 'SELECT * FROM {}'.format(table_name)
     c = conn.execute(sql)
@@ -182,7 +171,7 @@ def select_all(table_name, conn=None):
 
 
 @connect
-def update_one(name, price, quantity, table_name, conn=None):
+def update_one(conn, name, price, quantity, table_name):
     table_name = scrub(table_name)
     sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name=? LIMIT 1)'\
         .format(table_name)
@@ -200,7 +189,7 @@ def update_one(name, price, quantity, table_name, conn=None):
 
 
 @connect
-def delete_one(name, table_name, conn=None):
+def delete_one(conn, name, table_name):
     table_name = scrub(table_name)
     sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE name=? LIMIT 1)'\
         .format(table_name)
@@ -219,41 +208,43 @@ def delete_one(name, table_name, conn=None):
 
 def main():
 
-    conn = connect_to_db()
-
     table_name = 'items'
-    create_table(table_name, conn=conn)
+    conn = connect_to_db(DB_name)
+
+    create_table(conn, table_name)
 
     # CREATE
-    insert_many(mock.items(), table_name='items', conn=conn)
-    insert_one('beer', price=2.0, quantity=5, table_name='items', conn=conn)
+    insert_many(conn, mock.items(), table_name='items')
+    insert_one(conn, 'beer', price=2.0, quantity=5, table_name='items')
     # if we try to insert an object already stored we get an ItemAlreadyStored
     # exception
-    # insert_one('milk', price=1.0, quantity=3, table_name='items', conn=conn)
+    # insert_one(conn, 'milk', price=1.0, quantity=3, table_name='items')
 
     # READ
     print('SELECT milk')
-    print(select_one('milk', table_name='items', conn=conn))
+    print(select_one(conn, 'milk', table_name='items'))
     print('SELECT all')
-    print(select_all(table_name='items', conn=conn))
+    print(select_all(conn, table_name='items'))
     # if we try to select an object not stored we get an ItemNotStored exception
-    # print(select_one('pizza', table_name='items', conn=conn))
+    # print(select_one(conn, 'pizza', table_name='items'))
+
+    # conn.close()  # the decorator @connect will reopen the connection
 
     # UPDATE
     print('UPDATE bread, SELECT bread')
-    update_one('bread', price=1.5, quantity=5, table_name='items', conn=conn)
-    print(select_one('bread', table_name='items', conn=conn))
+    update_one(conn, 'bread', price=1.5, quantity=5, table_name='items')
+    print(select_one(conn, 'bread', table_name='items'))
     # if we try to update an object not stored we get an ItemNotStored exception
     # print('UPDATE pizza')
-    # update_one('pizza', price=1.5, quantity=5, table_name='items', conn=conn)
+    # update_one(conn, 'pizza', price=1.5, quantity=5, table_name='items')
 
     # DELETE
     print('DELETE beer, SELECT all')
-    delete_one('beer', table_name='items', conn=conn)
-    print(select_all(table_name='items', conn=conn))
+    delete_one(conn, 'beer', table_name='items')
+    print(select_all(conn, table_name='items'))
     # if we try to delete an object not stored we get an ItemNotStored exception
     # print('DELETE fish')
-    # delete_one('fish', table_name='items', conn=conn)
+    # delete_one(conn, 'fish', table_name='items')
 
     # save (commit) the changes
     # conn.commit()
