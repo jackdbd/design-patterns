@@ -75,7 +75,7 @@ class QuadrilateralFactory(PolygonFactory):
 class _Polygon(ABC):
     """Basic abstract class for polygons.
 
-    This class is private because the client should not try to instanciate it.
+    This class is private because the client should not try to instantiate it.
     The instantiation process should be carried out by a Factory class.
     A _Polygon subclass MUST override ALL _Polygon's abstract methods, otherwise
     a TypeError will be raised as soon as we try to instantiate that subclass.
