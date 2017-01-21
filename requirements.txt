@@ -1,0 +1,13 @@
+alembic==0.8.7
+antiorm==1.2.1
+dataset==0.6.4
+db==0.1.1
+db-sqlite3==0.0.1
+Mako==1.0.4
+MarkupSafe==0.23
+normality==0.2.4
+psycopg2==2.6.2
+python-editor==1.0.1
+PyYAML==3.12
+six==1.10.0
+SQLAlchemy==1.0.15
