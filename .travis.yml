@@ -1,19 +1,19 @@
-# sudo: required  # see https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments
+sudo: required  # see https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments
 branches:
   only:
     - master
-# before_install:
-#   - sudo apt-get update -qq
+before_install:
+  - sudo apt-get update -qq
 language: python
 python:
   - "3.4"
   - "3.5"  # I'm using a virtual environment with this version
   - "3.6"
 install: "pip install -r requirements.txt"
+services:
+  - postgresql
 script: pytest
 notifications:
     email:
         on_success: change
         on_failure: always
-after_sucess:
-  - CODECLIMATE_REPO_TOKEN=92366bd8855b1e8ddf0386314a41ffde79941a20108a31ed31a466780246eee9 codeclimate-test-reporter  # defines as environment variable on travis-ci.org/
