@@ -3,6 +3,7 @@ import sys
 from io import StringIO
 from contextlib import contextmanager
 from borg import Borg, ChildShare, ChildNotShare
+from memento import Originator
 from null_object import NullObject
 from observer import Publisher, Subscriber
 from proxy import Proxy, Implementation
@@ -56,6 +57,17 @@ class TestBorg(unittest.TestCase):
         a.name = 'James'
         self.assertEqual(a.name, c.name)
         self.assertNotEqual(a.name, d.name)
+
+
+class TestMemento(unittest.TestCase):
+
+    def test_restore_state(self):
+        originator = Originator()
+        originator.state = 'State1'
+        memento1 = originator.save()
+        originator.state = 'State2'
+        originator.restore(memento1)
+        self.assertEqual(originator.state, 'State1')
 
 
 class TestNullObject(unittest.TestCase):
