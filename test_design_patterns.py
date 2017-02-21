@@ -1,8 +1,11 @@
 import unittest
 import sys
 from io import StringIO
+from ddt import ddt, data
 from contextlib import contextmanager
 from borg import Borg, ChildShare, ChildNotShare
+from interpreter import Interpreter, DeviceNotAvailable, ActionNotAvailable,\
+    IncorrectAction
 from memento import Originator
 from null_object import NullObject
 from observer import Publisher, Subscriber
@@ -57,6 +60,56 @@ class TestBorg(unittest.TestCase):
         a.name = 'James'
         self.assertEqual(a.name, c.name)
         self.assertNotEqual(a.name, d.name)
+
+
+@ddt
+class TestInterpreter(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.interpreter = Interpreter()
+
+    def test_opening_the_garage(self):
+        with captured_output() as (out, err):
+            self.interpreter.interpret('open -> garage')
+        output = out.getvalue().strip()
+        self.assertEqual(output, 'opening the garage')
+
+    def test_heat_the_boiler_up(self):
+        with captured_output() as (out, err):
+            self.interpreter.interpret('heat -> boiler -> 5')
+        output = out.getvalue().strip()
+        self.assertEqual(output, 'heat the boiler up by 5 degrees')
+
+    def test_cool_the_boiler_down(self):
+        with captured_output() as (out, err):
+            self.interpreter.interpret('cool -> boiler -> 3')
+        output = out.getvalue().strip()
+        self.assertEqual(output, 'cool the boiler down by 3 degrees')
+
+    def test_switch_the_television_on(self):
+        with captured_output() as (out, err):
+            self.interpreter.interpret('switch on -> television')
+        output = out.getvalue().strip()
+        self.assertEqual(output, 'switch off the television')
+
+    def test_switch_the_television_on(self):
+        with captured_output() as (out, err):
+            self.interpreter.interpret('switch off -> television')
+        output = out.getvalue().strip()
+        self.assertEqual(output, 'switch off the television')
+
+    @data('cool -> boiler', 'switch off -> television -> 4')
+    def test_raise_incorrect_action(self, val):
+        self.assertRaises(IncorrectAction, self.interpreter.interpret, val)
+
+    @data('break -> garage', 'smash -> television')
+    def test_raise_action_not_available(self, val):
+        self.assertRaises(ActionNotAvailable, self.interpreter.interpret, val)
+
+    @data('read -> book', 'open -> gate')
+    def test_raise_device_not_available(self, val):
+        self.assertRaises(DeviceNotAvailable, self.interpreter.interpret, val)
 
 
 class TestMemento(unittest.TestCase):
