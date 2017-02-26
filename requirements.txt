@@ -6,6 +6,7 @@ coverage==4.3.4
 dataset==0.6.4
 db==0.1.1
 db-sqlite3==0.0.1
+ddt==1.1.1
 Mako==1.0.4
 MarkupSafe==0.23
 normality==0.2.4
@@ -17,3 +18,5 @@ PyYAML==3.12
 requests==2.13.0
 six==1.10.0
 SQLAlchemy==1.0.15
+toolz==0.8.2
+transitions==0.4.3
