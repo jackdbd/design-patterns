@@ -9,7 +9,8 @@ Basic example with the transitions library
 https://github.com/tyarkoni/transitions
 """
 import random
-from transitions import Machine, MachineError
+from transitions import MachineError
+from transitions.extensions import GraphMachine
 
 
 class Process(object):
@@ -20,7 +21,7 @@ class Process(object):
         self.name = name
 
         # initialize the state machine
-        self.machine = Machine(model=self, states=self.states,
+        self.machine = GraphMachine(model=self, states=self.states,
                                initial='sleeping')
 
         # add transitions
@@ -32,6 +33,9 @@ class Process(object):
                                     dest='terminated', after='display_warning')
         self.machine.add_transition(trigger='random_trigger', source='*',
                                     dest='terminated', conditions=['is_valid'])
+
+        # create image of the state machine (requires GraphViz and pygraphviz)
+        self.graph.draw('my_state_diagram.png', prog='dot')
 
     def is_valid(self):
         return random.random() < 0.5
