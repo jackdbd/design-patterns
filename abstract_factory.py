@@ -85,7 +85,7 @@ class _Polygon(ABC):
         self._manufactured = factory_name
 
     def __str__(self):
-        return '{} {} manufactured by {} (perimeter: {}; area: {}).'\
+        return '{} {} manufactured by {} (perimeter: {}; area: {})'\
             .format(self.color, self.__class__.__name__, self.manufactured,
                     self.perimeter, self.area)
 
@@ -197,48 +197,62 @@ class _ConvexQuadrilateral(_Quadrilateral):
     pass
 
 
-def give_me_a_polygon(factory, color):
+def give_me_some_polygons(factories, color=None):
     """Interface between the client and a Factory class.
 
     Parameters
     ----------
-    factory : abc.ABCMeta
-        factory class
+    factories : list, or abc.ABCMeta
+        list of factory classes, or a factory class
     color : str
         color to pass to the manufacturing method of the factory class.
 
     Returns
     -------
-    product : an object manufactured by the Factory class
+    products : list
+        a list of objects manufactured by the Factory classes specified
     """
-    product = factory.make_polygon(color)
-    return product
+    if not hasattr(factories, '__len__'):
+        factories = [factories]
+
+    products = list()
+    for factory in factories:
+        num = random.randint(5, 10)
+        for i in range(num):
+            product = factory.make_polygon(color)
+            products.append(product)
+
+    return products
 
 
-def print_polygon(polygon, show_hierarchy=True):
+def print_polygon(polygon, show_repr=False, show_hierarchy=False):
     print(str(polygon))
-    print(repr(polygon))
+    if show_repr:
+        print(repr(polygon))
     if show_hierarchy:
         print(inspect.getmro(polygon.__class__))
-    print('\n')
+        print('\n')
 
 
 def main():
-
-    print('\nsome red triangles...')
-    for i in range(5):
-        triangle = give_me_a_polygon(TriangleFactory, color='red')
+    print("Let's start with something simple: some triangles")
+    triangles = give_me_some_polygons(TriangleFactory)
+    print('{} triangles'.format(len(triangles)))
+    for triangle in triangles:
         print_polygon(triangle)
 
-    print('\nsome blue triangles...')
-    for i in range(5):
-        triangle = give_me_a_polygon(TriangleFactory, color='blue')
-        print_polygon(triangle)
-
-    print('\nsome green squares...')
-    for i in range(5):
-        quadrilateral = give_me_a_polygon(QuadrilateralFactory, color='green')
+    print("\nuse a different factory and add a color")
+    quadrilaterals = give_me_some_polygons(QuadrilateralFactory, color='blue')
+    print('{} quadrilaterals'.format(len(quadrilaterals)))
+    for quadrilateral in quadrilaterals:
         print_polygon(quadrilateral)
+
+    print("\nand now a mix of everything. And all in red!")
+    factories = [TriangleFactory, QuadrilateralFactory]
+    polygons = give_me_some_polygons(factories, color='red')
+    print('{} polygons'.format(len(polygons)))
+    for polygon in polygons:
+        print_polygon(polygon)
 
     print('we can still instantiate directly any subclass of _Polygon (but we '
           'shouldn\'t because they are private)')

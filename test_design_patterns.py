@@ -6,6 +6,9 @@ from contextlib import contextmanager
 from borg import Borg, ChildShare, ChildNotShare
 from interpreter import Interpreter, DeviceNotAvailable, ActionNotAvailable,\
     IncorrectAction
+from factory_method import factory_method
+from abstract_factory import TriangleFactory, QuadrilateralFactory, \
+    give_me_some_polygons
 from memento import Originator
 from null_object import NullObject
 from observer import Publisher, Subscriber
@@ -91,9 +94,9 @@ class TestInterpreter(unittest.TestCase):
         with captured_output() as (out, err):
             self.interpreter.interpret('switch on -> television')
         output = out.getvalue().strip()
-        self.assertEqual(output, 'switch off the television')
+        self.assertEqual(output, 'switch on the television')
 
-    def test_switch_the_television_on(self):
+    def test_switch_the_television_off(self):
         with captured_output() as (out, err):
             self.interpreter.interpret('switch off -> television')
         output = out.getvalue().strip()
@@ -143,6 +146,33 @@ class TestNullObject(unittest.TestCase):
 
     def test_get_stuff_gets_nothing(self):
         self.assertIsNone(self.null.get_stuff())
+
+
+class TestFactoryMethod(unittest.TestCase):
+
+    def test_factory_cannot_manufacture_a_train(self):
+        self.assertRaises(ValueError, factory_method, 'train')
+
+
+class TestAbstractFactory(unittest.TestCase):
+
+    def test_factories_are_abstract_and_cannot_be_instantiated(self):
+        with self.assertRaises(TypeError):
+            TriangleFactory()
+        with self.assertRaises(TypeError):
+            QuadrilateralFactory()
+
+    def test_triangle_factory_produces_triangles(self):
+        triangle = TriangleFactory.make_polygon()
+        self.assertIn(triangle.__class__.__name__, TriangleFactory.products())
+
+    def test_polygons_produced_are_subset_of_all_available_polygons(self):
+        all_available_polygons = set(TriangleFactory.products())\
+            .union(QuadrilateralFactory.products())
+        polygons = give_me_some_polygons(
+            [TriangleFactory, QuadrilateralFactory])
+        polygons_produced = set([p.__class__.__name__ for p in polygons])
+        self.assertTrue(polygons_produced.issubset(all_available_polygons))
 
 
 class TestObserver(unittest.TestCase):
