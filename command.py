@@ -5,16 +5,19 @@ that executes an action, from the one that requests the execution. Command can
 be useful when we want to create a batch of operations and execute them later.
 """
 import datetime
+from copy import deepcopy
 
 
-def rename_command(x, y, undo=False):
+def rename_command(x, y, *args, **kwargs):
+    undo = kwargs.get('undo', False)
     if not undo:
         print('rename {} into {}'.format(x, y))
     else:
         print('rename {} into {}'.format(y, x))
 
 
-def move_command(x, source, dest, undo=False):
+def move_command(x, source, dest, *args, **kwargs):
+    undo = kwargs.get('undo', False)
     if not undo:
         print('move {} from {} to {}'.format(x, source, dest))
     else:
@@ -47,11 +50,14 @@ class Queue(object):
         self.execute(commands)
 
     def undo(self):
-        commands = self._history[-1]
+        original_commands = self._history[-1]
+        commands = deepcopy(original_commands)
         for cmd in commands:
             func = cmd['func']
             args, kwargs = cmd['args'], cmd['kwargs']
-            func(undo=True, *args, **kwargs)
+            # we need to store the "undo" within the command (for history)
+            kwargs.update({'undo': True})
+            func(*args, **kwargs)
         self.update_history(commands)
 
     def clear_queue(self):
@@ -61,8 +67,6 @@ class Queue(object):
         self._history.append(commands)
 
     def history(self):
-        # TODO: history should show the correct "caller" (execute, redo, undo)
-        # TODO: the printout of the undo commands is wrong
         for i, commands in enumerate(self._history):
             print('Set of commands {}'.format(i))
             for cmd in commands:
