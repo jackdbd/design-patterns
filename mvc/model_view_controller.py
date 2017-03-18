@@ -14,9 +14,9 @@ class Model(object):
     """The Model class is the business logic of the application.
 
     The Model class provides methods to access the data of the application and
-    performs CRUD operations. The data can be stored in the Model itself or in a
-    database. Only the Model can access the database. A Model never calls View's
-    methods.
+    performs CRUD operations. The data can be stored in the Model itself or in
+    a database. Only the Model can access the database. A Model never calls
+    View's methods.
     """
     def __init__(self):
         self._item_type = 'product'
@@ -112,14 +112,13 @@ class ModelSQLite(Model):
             self.connection, name, table_name=self.item_type)
 
 
-################################################################################
 class ModelDataset(Model):
 
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
         self._connection = dataset_backend.connect_to_db(
-            dataset_backend.DB_name)
+            dataset_backend.DB_name, db_engine='postgres')
         dataset_backend.create_table(self.connection, self._item_type)
         self.create_items(application_items)
 
@@ -150,7 +149,6 @@ class ModelDataset(Model):
     def delete_item(self, name):
         dataset_backend.delete_one(
             self.connection, name, table_name=self.item_type)
-################################################################################
 
 
 class View(object):
@@ -172,61 +170,61 @@ class View(object):
 
     @staticmethod
     def show_item(item_type, item, item_info):
-        print('///////////////////////////////////////////////////////////////')
+        print('//////////////////////////////////////////////////////////////')
         print('Good news, we have some {}!'.format(item.upper()))
         print('{} INFO: {}'.format(item_type.upper(), item_info))
-        print('///////////////////////////////////////////////////////////////')
+        print('//////////////////////////////////////////////////////////////')
 
     @staticmethod
     def display_missing_item_error(item, err):
-        print('***************************************************************')
+        print('**************************************************************')
         print('We are sorry, we have no {}!'.format(item.upper()))
         print('{}'.format(err.args[0]))
-        print('***************************************************************')
+        print('**************************************************************')
 
     @staticmethod
     def display_item_already_stored_error(item, item_type, err):
-        print('***************************************************************')
+        print('**************************************************************')
         print('Hey! We already have {} in our {} list!'
               .format(item.upper(), item_type))
         print('{}'.format(err.args[0]))
-        print('***************************************************************')
+        print('**************************************************************')
 
     @staticmethod
     def display_item_not_yet_stored_error(item, item_type, err):
-        print('***************************************************************')
+        print('**************************************************************')
         print('We don\'t have any {} in our {} list. Please insert it first!'
               .format(item.upper(), item_type))
         print('{}'.format(err.args[0]))
-        print('***************************************************************')
+        print('**************************************************************')
 
     @staticmethod
     def display_item_stored(item, item_type):
-        print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('Hooray! We have just added some {} to our {} list!'
               .format(item.upper(), item_type))
-        print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     @staticmethod
     def display_change_item_type(older, newer):
-        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
         print('Change item type from "{}" to "{}"'.format(older, newer))
-        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
 
     @staticmethod
     def display_item_updated(item, o_price, o_quantity, n_price, n_quantity):
-        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
         print('Change {} price: {} --> {}'
               .format(item, o_price, n_price))
         print('Change {} quantity: {} --> {}'
               .format(item, o_quantity, n_quantity))
-        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---')
+        print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
 
     @staticmethod
     def display_item_deletion(name):
-        print('---------------------------------------------------------------')
+        print('--------------------------------------------------------------')
         print('We have just removed {} from our list'.format(name))
-        print('---------------------------------------------------------------')
+        print('--------------------------------------------------------------')
 
 
 class Controller(object):
@@ -301,8 +299,8 @@ if __name__ == '__main__':
 
     myitems = mock.items()
 
-    # c = Controller(ModelBasic(myitems), View())
-    c = Controller(ModelSQLite(myitems), View())
+    c = Controller(ModelBasic(myitems), View())
+    # c = Controller(ModelSQLite(myitems), View())
     # c = Controller(ModelDataset(myitems), View())
 
     c.show_items()
