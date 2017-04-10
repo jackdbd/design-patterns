@@ -14,7 +14,6 @@ import mvc_mock_objects as mock
 
 
 DB_name = 'myDB'
-# DB_name = ':memory:'  # in-memory database
 
 
 def connect_to_db(db=None):
@@ -112,7 +111,6 @@ def create_table(conn, table_name):
           'name TEXT UNIQUE, price REAL, quantity INTEGER)'.format(table_name)
     try:
         conn.execute(sql)
-        conn.commit()  # is it really needed if we just create a table?
     except OperationalError as e:
         print(e)
 
@@ -209,7 +207,8 @@ def delete_one(conn, name, table_name):
 def main():
 
     table_name = 'items'
-    conn = connect_to_db(DB_name)
+    conn = connect_to_db()  # in-memory database
+    # conn = connect_to_db(DB_name)
 
     create_table(conn, table_name)
 

@@ -14,7 +14,6 @@ def create_item(name, price, quantity):
 
 
 def create_items(app_items):
-    # TODO: raise ItemAlreadyStored if at least one item is alredy in items
     global items
     items = app_items
 
