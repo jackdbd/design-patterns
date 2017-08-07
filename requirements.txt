@@ -1,6 +1,6 @@
 alembic==0.9.4
 antiorm==1.2.1
-appdirs==1.4.0
+appdirs==1.4.3
 chardet==2.3.0
 codeclimate-test-reporter==0.2.0
 coverage==4.3.4
