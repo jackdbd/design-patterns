@@ -8,7 +8,7 @@ dataset==0.8.0
 db==0.1.1
 db-sqlite3==0.0.1
 ddt==1.1.1
-Mako==1.0.6
+Mako==1.0.7
 MarkupSafe==1.0
 normality==0.4.0
 packaging==16.8
