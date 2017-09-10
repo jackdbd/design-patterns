@@ -4,6 +4,8 @@ venv/
 # ignore PyCharm project config files and autocompletion
 /.idea/*
 
+.vscode/
+
 # ignore compiled bytecode of Python source files
 *.pyc
  __pycache__
