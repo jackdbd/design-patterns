@@ -1,4 +1,4 @@
-alembic==0.9.5
+alembic==0.9.6
 antiorm==1.2.1
 appdirs==1.4.3
 chardet==3.0.4
