@@ -4,7 +4,7 @@ appdirs==1.4.3
 chardet==3.0.4
 codeclimate-test-reporter==0.2.3
 coverage==4.4.1
-dataset==1.0.2
+dataset==1.0.3
 db==0.1.1
 db-sqlite3==0.0.1
 ddt==1.1.1
