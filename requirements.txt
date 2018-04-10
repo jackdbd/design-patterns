@@ -2,8 +2,10 @@ alembic==0.9.9
 antiorm==1.2.1
 appdirs==1.4.3
 attrs==17.4.0
+banal==0.3.3
 boto3==1.7.3
 botocore==1.10.3
+certifi==2018.1.18
 chardet==3.0.4
 codeclimate-test-reporter==0.2.3
 coverage==4.5.1
@@ -13,7 +15,8 @@ db-sqlite3==0.0.1
 ddt==1.1.2
 docutils==0.14
 funcsigs==1.0.2
-futures==3.2.0
+futures==3.1.1
+idna==2.6
 jmespath==0.9.3
 Mako==1.0.7
 MarkupSafe==1.0
@@ -37,4 +40,5 @@ SQLAlchemy==1.2.6
 toolz==0.9.0
 tox==3.0.0
 transitions==0.6.4
+urllib3==1.22
 virtualenv==15.2.0
