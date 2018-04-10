@@ -7,10 +7,10 @@ before_install:
   - sudo apt-get install graphviz -y
 language: python
 python:
-  - "3.4"
   - "3.5"  # I'm using a virtual environment with this version
   - "3.6"
-install: "pip install -r requirements.txt"
+install:
+  - pip install -r requirements.txt
 services:
   - postgresql
 script: pytest
