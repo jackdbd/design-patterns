@@ -38,4 +38,4 @@ SQLAlchemy==1.1.6
 toolz==0.8.2
 tox==2.6.0
 transitions==0.4.3
-virtualenv==15.1.0
+virtualenv==15.2.0
