@@ -34,7 +34,7 @@ PyYAML==3.12
 requests==2.13.0
 s3transfer==0.1.10
 six==1.10.0
-SQLAlchemy==1.1.6
+SQLAlchemy==1.2.6
 toolz==0.8.2
 tox==2.6.0
 transitions==0.4.3
