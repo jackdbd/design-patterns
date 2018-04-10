@@ -8,14 +8,14 @@ import mvc_exceptions as mvc_exc
 import mvc_mock_objects as mock
 
 
-DB_name = 'myDB'
+DB_name = "myDB"
 
 
 class UnsupportedDatabaseEngine(Exception):
     pass
 
 
-def connect_to_db(db_name=None, db_engine='sqlite'):
+def connect_to_db(db_name=None, db_engine="sqlite"):
     """Connect to a database. Create the database if there isn't one yet.
 
     The database can be a SQLite DB (either a DB file or an in-memory DB), or a
@@ -39,24 +39,24 @@ def connect_to_db(db_name=None, db_engine='sqlite'):
     dataset.persistence.database.Database
         connection to a database
     """
-    engines = {'sqlite', 'postgres'}
+    engines = {"sqlite", "postgres"}
     if db_name is None:
-        db_string = 'sqlite:///:memory:'
-        print('New connection to in-memory SQLite DB...')
+        db_string = "sqlite:///:memory:"
+        print("New connection to in-memory SQLite DB...")
     else:
-        if db_engine == 'sqlite':
-            db_string = 'sqlite:///{}.db'.format(DB_name)
-            print('New connection to SQLite DB...')
-        elif db_engine == 'postgres':
-            db_string = \
-                'postgresql://test_user:test_password@localhost:5432/testdb'
+        if db_engine == "sqlite":
+            db_string = "sqlite:///{}.db".format(DB_name)
+            print("New connection to SQLite DB...")
+        elif db_engine == "postgres":
+            db_string = "postgresql://test_user:test_password@localhost:5432/testdb"
             # db_string = \
             #     'postgresql://test_user2:test_password2@localhost:5432/testdb'
-            print('New connection to PostgreSQL DB...')
+            print("New connection to PostgreSQL DB...")
         else:
             raise UnsupportedDatabaseEngine(
-                'No database engine with this name. '
-                'Choose one of the following: {}'.format(engines))
+                "No database engine with this name. "
+                "Choose one of the following: {}".format(engines)
+            )
 
     return dataset.connect(db_string)
 
@@ -80,9 +80,9 @@ def create_table(conn, table_name):
     try:
         conn.load_table(table_name)
     except NoSuchTableError as e:
-        print('Table {} does not exist. It will be created now'.format(e))
-        conn.get_table(table_name, primary_id='name', primary_type='String')
-        print('Created table {} on database {}'.format(table_name, DB_name))
+        print("Table {} does not exist. It will be created now".format(e))
+        conn.get_table(table_name, primary_id="name", primary_type="String")
+        print("Created table {} on database {}".format(table_name, DB_name))
 
 
 def insert_one(conn, name, price, quantity, table_name):
@@ -105,8 +105,10 @@ def insert_one(conn, name, price, quantity, table_name):
         table.insert(dict(name=name, price=price, quantity=quantity))
     except IntegrityError as e:
         raise mvc_exc.ItemAlreadyStored(
-            '"{}" already stored in table "{}".\nOriginal Exception raised: {}'
-            .format(name, table.table.name, e))
+            '"{}" already stored in table "{}".\nOriginal Exception raised: {}'.format(
+                name, table.table.name, e
+            )
+        )
 
 
 def insert_many(conn, items, table_name):
@@ -123,12 +125,14 @@ def insert_many(conn, items, table_name):
     table = conn.load_table(table_name)
     try:
         for x in items:
-            table.insert(dict(
-                name=x['name'], price=x['price'], quantity=x['quantity']))
+            table.insert(dict(name=x["name"], price=x["price"], quantity=x["quantity"]))
     except IntegrityError as e:
-        print('At least one in {} was already stored in table "{}".\nOriginal '
-              'Exception raised: {}'
-              .format([x['name'] for x in items], table.table.name, e))
+        print(
+            'At least one in {} was already stored in table "{}".\nOriginal '
+            "Exception raised: {}".format(
+                [x["name"] for x in items], table.table.name, e
+            )
+        )
 
 
 def select_one(conn, name, table_name):
@@ -151,10 +155,13 @@ def select_one(conn, name, table_name):
     row = table.find_one(name=name)
     if row is not None:
         return dict(row)
+
     else:
         raise mvc_exc.ItemNotStored(
-            'Can\'t read "{}" because it\'s not stored in table "{}"'
-            .format(name, table.table.name))
+            'Can\'t read "{}" because it\'s not stored in table "{}"'.format(
+                name, table.table.name
+            )
+        )
 
 
 def select_all(conn, table_name):
@@ -200,12 +207,14 @@ def update_one(conn, name, price, quantity, table_name):
     table = conn.load_table(table_name)
     row = table.find_one(name=name)
     if row is not None:
-        item = {'name': name, 'price': price, 'quantity': quantity}
-        table.update(item, keys=['name'])
+        item = {"name": name, "price": price, "quantity": quantity}
+        table.update(item, keys=["name"])
     else:
         raise mvc_exc.ItemNotStored(
-            'Can\'t update "{}" because it\'s not stored in table "{}"'
-            .format(name, table.table.name))
+            'Can\'t update "{}" because it\'s not stored in table "{}"'.format(
+                name, table.table.name
+            )
+        )
 
 
 def delete_one(conn, item_name, table_name):
@@ -227,47 +236,51 @@ def delete_one(conn, item_name, table_name):
         table.delete(name=item_name)
     else:
         raise mvc_exc.ItemNotStored(
-            'Can\'t delete "{}" because it\'s not stored in table "{}"'
-            .format(item_name, table.table.name))
+            'Can\'t delete "{}" because it\'s not stored in table "{}"'.format(
+                item_name, table.table.name
+            )
+        )
 
 
 def main():
 
     conn = connect_to_db()
 
-    table_name = 'items'
+    table_name = "items"
     create_table(conn, table_name)
 
     # CREATE
     insert_many(conn, items=mock.items(), table_name=table_name)
-    insert_one(conn, 'beer', price=2.0, quantity=5, table_name=table_name)
+    insert_one(conn, "beer", price=2.0, quantity=5, table_name=table_name)
     # if we try to insert an object already stored we get an ItemAlreadyStored
     # exception
     # insert_one(conn, 'beer', 2.0, 5, table_name=table_name)
 
     # READ
-    print('SELECT milk')
-    print(select_one(conn, 'milk', table_name=table_name))
-    print('SELECT all')
+    print("SELECT milk")
+    print(select_one(conn, "milk", table_name=table_name))
+    print("SELECT all")
     print(select_all(conn, table_name=table_name))
     # if we try to select an object not stored we get an ItemNotStored exception
     # print(select_one(conn, 'pizza', table_name=table_name))
 
     # UPDATE
-    print('UPDATE bread, SELECT bread')
-    update_one(conn, 'bread', price=1.5, quantity=5, table_name=table_name)
-    print(select_one(conn, 'bread', table_name=table_name))
+    print("UPDATE bread, SELECT bread")
+    update_one(conn, "bread", price=1.5, quantity=5, table_name=table_name)
+    print(select_one(conn, "bread", table_name=table_name))
     # if we try to update an object not stored we get an ItemNotStored exception
     # print('UPDATE pizza')
     # update_one(conn, 'pizza', 9.5, 5, table_name=table_name)
 
     # DELETE
-    print('DELETE beer, SELECT all')
-    delete_one(conn, 'beer', table_name=table_name)
+    print("DELETE beer, SELECT all")
+    delete_one(conn, "beer", table_name=table_name)
     print(select_all(conn, table_name=table_name))
-    # if we try to delete an object not stored we get an ItemNotStored exception
-    # print('DELETE fish')
-    # delete_one(conn, 'fish', table_name=table_name)
 
-if __name__ == '__main__':
+
+# if we try to delete an object not stored we get an ItemNotStored exception
+# print('DELETE fish')
+# delete_one(conn, 'fish', table_name=table_name)
+
+if __name__ == "__main__":
     main()

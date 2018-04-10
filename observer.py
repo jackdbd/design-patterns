@@ -1,4 +1,3 @@
-
 class Subscriber(object):
     """It's the Observer object. It receives messages from the Observable."""
 
@@ -15,7 +14,7 @@ class Subscriber(object):
         ----------
         message : str
         """
-        print('{} received: {}'.format(self.name, message))
+        print("{} received: {}".format(self.name, message))
 
 
 class Publisher(object):
@@ -40,7 +39,7 @@ class Publisher(object):
             callback function bound to the Subscriber object
         """
         if callback is None:
-            callback = getattr(who, 'receive')
+            callback = getattr(who, "receive")
         self.get_subscriptions(newsletter)[who] = callback
 
     def unregister(self, newsletter, who):
@@ -54,8 +53,11 @@ class Publisher(object):
         try:
             del self.get_subscriptions(newsletter)[who]
         except KeyError:
-            print('{} is not subscribed to the {} newsletter!'
-                  .format(who.name, newsletter))
+            print(
+                "{} is not subscribed to the {} newsletter!".format(
+                    who.name, newsletter
+                )
+            )
 
     def dispatch(self, newsletter, message):
         """Send a message to all subscribers registered to this newsletter.
@@ -66,9 +68,13 @@ class Publisher(object):
         message : str
         """
         if len(self.get_subscriptions(newsletter).items()) == 0:
-            print('No subscribers for the {} newsletter. Nothing to send!'
-                  .format(newsletter))
+            print(
+                "No subscribers for the {} newsletter. Nothing to send!".format(
+                    newsletter
+                )
+            )
             return
+
         for subscriber, callback in self.get_subscriptions(newsletter).items():
             callback(message)
 
@@ -88,34 +94,34 @@ class Publisher(object):
 
 def main():
 
-    pub = Publisher(newsletters=['Tech', 'Travel'])
+    pub = Publisher(newsletters=["Tech", "Travel"])
 
-    tom = Subscriber('Tom')
-    sara = Subscriber('Sara')
-    john = Subscriber('John')
+    tom = Subscriber("Tom")
+    sara = Subscriber("Sara")
+    john = Subscriber("John")
 
-    pub.register(newsletter='Tech', who=tom)
-    pub.register(newsletter='Travel', who=tom)
-    pub.register(newsletter='Travel', who=sara)
-    pub.register(newsletter='Tech', who=john)
+    pub.register(newsletter="Tech", who=tom)
+    pub.register(newsletter="Travel", who=tom)
+    pub.register(newsletter="Travel", who=sara)
+    pub.register(newsletter="Tech", who=john)
 
-    pub.dispatch(newsletter='Tech', message='Tech Newsletter num 1')
-    pub.dispatch(newsletter='Travel', message='Travel Newsletter num 1')
+    pub.dispatch(newsletter="Tech", message="Tech Newsletter num 1")
+    pub.dispatch(newsletter="Travel", message="Travel Newsletter num 1")
 
-    pub.unregister(newsletter='Tech', who=john)
+    pub.unregister(newsletter="Tech", who=john)
 
-    pub.dispatch(newsletter='Tech', message='Tech Newsletter num 2')
-    pub.dispatch(newsletter='Travel', message='Travel Newsletter num 2')
+    pub.dispatch(newsletter="Tech", message="Tech Newsletter num 2")
+    pub.dispatch(newsletter="Travel", message="Travel Newsletter num 2")
 
-    pub.add_newsletter('Fashion')
-    pub.register(newsletter='Fashion', who=tom)
-    pub.register(newsletter='Fashion', who=sara)
-    pub.register(newsletter='Fashion', who=john)
-    pub.dispatch(newsletter='Fashion', message='Fashion Newsletter num 1')
-    pub.unregister(newsletter='Fashion', who=tom)
-    pub.unregister(newsletter='Fashion', who=sara)
-    pub.dispatch(newsletter='Fashion', message='Fashion Newsletter num 2')
+    pub.add_newsletter("Fashion")
+    pub.register(newsletter="Fashion", who=tom)
+    pub.register(newsletter="Fashion", who=sara)
+    pub.register(newsletter="Fashion", who=john)
+    pub.dispatch(newsletter="Fashion", message="Fashion Newsletter num 1")
+    pub.unregister(newsletter="Fashion", who=tom)
+    pub.unregister(newsletter="Fashion", who=sara)
+    pub.dispatch(newsletter="Fashion", message="Fashion Newsletter num 2")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

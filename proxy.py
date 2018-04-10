@@ -28,10 +28,10 @@ class Implementation(CommonInterface):
         self.filename = filename
 
     def load(self):
-        print('load {}'.format(self.filename))
+        print("load {}".format(self.filename))
 
     def do_stuff(self):
-        print('do stuff on {}'.format(self.filename))
+        print("do stuff on {}".format(self.filename))
 
 
 class Proxy(CommonInterface):
@@ -51,8 +51,8 @@ class Proxy(CommonInterface):
 
 
 def main():
-    p1 = Proxy(Implementation('RealObject1'))
-    p2 = Proxy(Implementation('RealObject2'))
+    p1 = Proxy(Implementation("RealObject1"))
+    p2 = Proxy(Implementation("RealObject2"))
 
     p1.do_stuff()  # loading necessary
     p1.do_stuff()  # loading unnecessary (use cached object)
@@ -60,5 +60,6 @@ def main():
     p2.do_stuff()  # loading unnecessary (use cached object)
     p1.do_stuff()  # loading unnecessary (use cached object)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

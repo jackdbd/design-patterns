@@ -22,27 +22,28 @@ class Strategy(object):
             # bound method 'execute' with this new bound method.
             # The new 'execute' will be a normal method (self available).
             self.execute = types.MethodType(func, self)
-            self.name = '{}_{}'.format(self.__class__.__name__, func.__name__)
+            self.name = "{}_{}".format(self.__class__.__name__, func.__name__)
         else:
-            self.name = '{}_default'.format(self.__class__.__name__)
+            self.name = "{}_default".format(self.__class__.__name__)
 
     def execute(self):
-        print('Default method')
-        print('{}\n'.format(self.name))
+        print("Default method")
+        print("{}\n".format(self.name))
 
 
 # Replacement strategies for the default method 'execute'. These ones are
 # defined as normal functions, so we will need to bind them to an instance when
 # the object is instatiated (we can use types.MethodType).
 
+
 def execute_replacement1(self):
-    print('Replacement1 method')
-    print('{}\n'.format(self.name))
+    print("Replacement1 method")
+    print("{}\n".format(self.name))
 
 
 def execute_replacement2(self):
-    print('Replacement2 method')
-    print('{}\n'.format(self.name))
+    print("Replacement2 method")
+    print("{}\n".format(self.name))
 
 
 def main():
@@ -58,5 +59,6 @@ def main():
     s2 = Strategy(execute_replacement2)
     s2.execute()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

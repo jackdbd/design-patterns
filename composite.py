@@ -8,7 +8,7 @@ class Component(ABC):
     def __init__(self, name):
         self.name = name
         self.level = 0
-        self.indentation = ''
+        self.indentation = ""
 
     @abstractmethod
     def traverse(self):
@@ -22,7 +22,7 @@ class Component(ABC):
 class Leaf(Component):
 
     def traverse(self):
-        print('{}{}'.format(self.indentation, self.name))
+        print("{}{}".format(self.indentation, self.name))
 
 
 class Composite(Component):
@@ -36,39 +36,40 @@ class Composite(Component):
     # namely a client cannot append/remove a child from a Leaf), or design such
     # interface in the Component class (we have transparency, but a client
     # could try to perform meaningless things like appending a node to a Leaf)
+
     def append_child(self, child):
         child.level = self.level + 1
-        child.indentation = ' ' * child.level * 2
+        child.indentation = " " * child.level * 2
         self.children.append(child)
 
     def remove_child(self, child):
         self.children.remove(child)
 
     def traverse(self):
-        print('{}{}'.format(self.indentation, self.name))
+        print("{}{}".format(self.indentation, self.name))
         [x.traverse() for x in self.children]
 
 
 def main():
-    c0 = Composite('/')
-    l0 = Leaf('hello.txt')
-    l1 = Leaf('readme.txt')
-    c1 = Composite('home')
+    c0 = Composite("/")
+    l0 = Leaf("hello.txt")
+    l1 = Leaf("readme.txt")
+    c1 = Composite("home")
     c0.append_child(l0)
     c0.append_child(l1)
     c0.append_child(c1)
 
-    l2 = Leaf('notes.txt')
-    l3 = Leaf('todo.txt')
-    c2 = Composite('documents')
+    l2 = Leaf("notes.txt")
+    l3 = Leaf("todo.txt")
+    c2 = Composite("documents")
     c1.append_child(l2)
     c1.append_child(l3)
     c1.append_child(c2)
 
-    l4 = Leaf('draft.txt')
+    l4 = Leaf("draft.txt")
     c2.append_child(l4)
 
-    print('Traverse the entire directory tree')
+    print("Traverse the entire directory tree")
     c0.traverse()
 
     print('\nRemove "todo.txt" and traverse the tree once again')
@@ -80,5 +81,5 @@ def main():
     c0.traverse()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

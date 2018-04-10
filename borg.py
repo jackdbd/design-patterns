@@ -17,8 +17,7 @@ class Borg(object):
 
     def __str__(self):
         cls = self.__class__.__name__
-        return 'Class: {}; ID: {}; state: {}'\
-            .format(cls, id(self), self._shared_state)
+        return "Class: {}; ID: {}; state: {}".format(cls, id(self), self._shared_state)
 
     @property
     def state(self):
@@ -28,6 +27,7 @@ class Borg(object):
 class ChildShare(Borg):
     """All instances of ChildShare share state with themselves and with all
     instances of Borg."""
+
     def __init__(self, name=None, color=None):
         super().__init__(name)  # ok in Python 3.x, not in 2.x
 
@@ -50,36 +50,36 @@ class ChildNotShare(Borg):
 
 
 def main():
-    print('2 instances of Borg')
-    a = Borg('Mark')
+    print("2 instances of Borg")
+    a = Borg("Mark")
     print(a)
-    b = Borg('Luke')
+    b = Borg("Luke")
     print(a)
     print(b)
     assert a is not b
     assert a.state is b.state
 
-    print('\n1 instance of Borg and 1 of ChildShare')
-    c = ChildShare('Paul', color='red')
+    print("\n1 instance of Borg and 1 of ChildShare")
+    c = ChildShare("Paul", color="red")
     print(a)
     print(c)
     assert a.state is c.state
 
-    print('\n1 instance of Borg, 1 of ChildShare, and 1 of ChildNotShare')
-    d = ChildNotShare('Andrew', age=5)
+    print("\n1 instance of Borg, 1 of ChildShare, and 1 of ChildNotShare")
+    d = ChildNotShare("Andrew", age=5)
     print(a)
     print(c)
     print(d)
     assert a.state is not d.state
 
-    print('\n2 instances of ChildNotShare')
-    e = ChildNotShare('Tom', age=7)
+    print("\n2 instances of ChildNotShare")
+    e = ChildNotShare("Tom", age=7)
     print(d)
     print(e)
     assert d.state is e.state
 
-    print('\nSet an attribute directly')
-    a.name = 'James'
+    print("\nSet an attribute directly")
+    a.name = "James"
     print(a)
     print(b)
     print(c)
@@ -89,5 +89,5 @@ def main():
     assert a.name is not d.name
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

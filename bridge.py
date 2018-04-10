@@ -15,6 +15,8 @@ from abc import ABC, abstractmethod
 
 
 # Abstract Interface (aka Handle) used by the client
+
+
 class Website(ABC):
 
     def __init__(self, implementation):
@@ -22,8 +24,9 @@ class Website(ABC):
         self._implementation = implementation
 
     def __str__(self):
-        return 'Interface: {}; Implementation: {}'.format(
-            self.__class__.__name__, self._implementation.__class__.__name__)
+        return "Interface: {}; Implementation: {}".format(
+            self.__class__.__name__, self._implementation.__class__.__name__
+        )
 
     @abstractmethod
     def show_page(self):
@@ -31,6 +34,8 @@ class Website(ABC):
 
 
 # Concrete Interface 1
+
+
 class FreeWebsite(Website):
 
     def show_page(self):
@@ -40,29 +45,33 @@ class FreeWebsite(Website):
         print(ads)
         print(text)
         print(call_to_action)
-        print('')
+        print("")
 
 
 # Concrete Interface 2
+
+
 class PaidWebsite(Website):
 
     def show_page(self):
         text = self._implementation.get_article()
         print(text)
-        print('')
+        print("")
 
 
 # Abstract Implementation (aka Body) decoupled from the client
+
+
 class Implementation(ABC):
 
     def get_excerpt(self):
-        return 'excerpt from the article'
+        return "excerpt from the article"
 
     def get_article(self):
-        return 'full article'
+        return "full article"
 
     def get_ads(self):
-        return 'some ads'
+        return "some ads"
 
     @abstractmethod
     def get_call_to_action(self):
@@ -70,20 +79,26 @@ class Implementation(ABC):
 
 
 # Concrete Implementation 1
+
+
 class ImplementationA(Implementation):
 
     def get_call_to_action(self):
-        return 'Pay 10 $ a month to remove ads'
+        return "Pay 10 $ a month to remove ads"
 
 
 # Concrete Implementation 2
+
+
 class ImplementationB(Implementation):
 
     def get_call_to_action(self):
-        return 'Remove ads with just 10 $ a month'
+        return "Remove ads with just 10 $ a month"
 
 
 # Client
+
+
 def main():
     a_free = FreeWebsite(ImplementationA())
     print(a_free)
@@ -104,8 +119,10 @@ def main():
     # in a real world scenario, we could perform A/B testing of our website by
     # choosing a random implementation
     import random
+
     impl = random.choice([ImplementationA(), ImplementationB()])
     print(FreeWebsite(impl))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -25,7 +25,7 @@ class Algorithm(ABC):
     def __do_absolutely_this(self):
         """Protected operation. DON'T override me."""
         this_method_name = sys._getframe().f_code.co_name
-        print('{}.{}'.format(self.__class__.__name__, this_method_name))
+        print("{}.{}".format(self.__class__.__name__, this_method_name))
 
     @abstractmethod
     def do_step_1(self):
@@ -39,38 +39,39 @@ class Algorithm(ABC):
 
     def do_something(self):
         """Hook. You CAN override me, I'm NOT a placeholder."""
-        print('do something')
+        print("do something")
 
 
 class AlgorithmA(Algorithm):
 
     def do_step_1(self):
-        print('do step 1 for Algorithm A')
+        print("do step 1 for Algorithm A")
 
     def do_step_2(self):
-        print('do step 2 for Algorithm A')
+        print("do step 2 for Algorithm A")
 
 
 class AlgorithmB(Algorithm):
 
     def do_step_1(self):
-        print('do step 1 for Algorithm B')
+        print("do step 1 for Algorithm B")
 
     def do_step_2(self):
-        print('do step 2 for Algorithm B')
+        print("do step 2 for Algorithm B")
 
     def do_something(self):
-        print('do something else')
+        print("do something else")
 
 
 def main():
-    print('Algorithm A')
+    print("Algorithm A")
     a = AlgorithmA()
     a.template_method()
 
-    print('\nAlgorithm B')
+    print("\nAlgorithm B")
     b = AlgorithmB()
     b.template_method()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

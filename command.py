@@ -9,19 +9,19 @@ from copy import deepcopy
 
 
 def rename_command(x, y, *args, **kwargs):
-    undo = kwargs.get('undo', False)
+    undo = kwargs.get("undo", False)
     if not undo:
-        print('rename {} into {}'.format(x, y))
+        print("rename {} into {}".format(x, y))
     else:
-        print('rename {} into {}'.format(y, x))
+        print("rename {} into {}".format(y, x))
 
 
 def move_command(x, source, dest, *args, **kwargs):
-    undo = kwargs.get('undo', False)
+    undo = kwargs.get("undo", False)
     if not undo:
-        print('move {} from {} to {}'.format(x, source, dest))
+        print("move {} from {} to {}".format(x, source, dest))
     else:
-        print('move {} from {} to {}'.format(x, dest, source))
+        print("move {} from {} to {}".format(x, dest, source))
 
 
 class Queue(object):
@@ -32,15 +32,16 @@ class Queue(object):
 
     def add_command(self, func, *args, **kwargs):
         timestamp = datetime.datetime.now().isoformat()
-        self._commands.append({'timestamp': timestamp,
-                               'func': func, 'args': args, 'kwargs': kwargs})
+        self._commands.append(
+            {"timestamp": timestamp, "func": func, "args": args, "kwargs": kwargs}
+        )
 
     def execute(self, commands=None):
         if commands is None:
             commands = self._commands
         for cmd in commands:
-            func = cmd['func']
-            args, kwargs = cmd['args'], cmd['kwargs']
+            func = cmd["func"]
+            args, kwargs = cmd["args"], cmd["kwargs"]
             func(*args, **kwargs)
         self.update_history(commands)
         self.clear_queue()
@@ -53,10 +54,10 @@ class Queue(object):
         original_commands = self._history[-1]
         commands = deepcopy(original_commands)
         for cmd in commands:
-            func = cmd['func']
-            args, kwargs = cmd['args'], cmd['kwargs']
+            func = cmd["func"]
+            args, kwargs = cmd["args"], cmd["kwargs"]
             # we need to store the "undo" within the command (for history)
-            kwargs.update({'undo': True})
+            kwargs.update({"undo": True})
             func(*args, **kwargs)
         self.update_history(commands)
 
@@ -68,40 +69,40 @@ class Queue(object):
 
     def history(self):
         for i, commands in enumerate(self._history):
-            print('Set of commands {}'.format(i))
+            print("Set of commands {}".format(i))
             for cmd in commands:
-                t = cmd['timestamp']
-                f = cmd['func'].__name__
-                ar, kw = cmd['args'], cmd['kwargs']
-                print(' {} - f: {} args: {} kwargs: {}'.format(t, f, ar, kw))
+                t = cmd["timestamp"]
+                f = cmd["func"].__name__
+                ar, kw = cmd["args"], cmd["kwargs"]
+                print(" {} - f: {} args: {} kwargs: {}".format(t, f, ar, kw))
 
 
 def main():
     queue = Queue()
 
-    queue.add_command(rename_command, 'test.py', 'hello.py')
-    queue.add_command(move_command, 'hello.py', source='/lib', dest='/home')
-    queue.add_command(rename_command, x='readme.txt', y='README.txt')
+    queue.add_command(rename_command, "test.py", "hello.py")
+    queue.add_command(move_command, "hello.py", source="/lib", dest="/home")
+    queue.add_command(rename_command, x="readme.txt", y="README.txt")
 
-    print('Execute all commands as a single operation')
+    print("Execute all commands as a single operation")
     queue.execute()
 
-    print('\nRedo last operation')
+    print("\nRedo last operation")
     queue.redo()
 
-    print('\nUndo last operation')
+    print("\nUndo last operation")
     queue.undo()
 
-    print('\nExecute a single command')
-    queue.add_command(move_command, 'hello.py', source='/lib', dest='/home')
+    print("\nExecute a single command")
+    queue.add_command(move_command, "hello.py", source="/lib", dest="/home")
     queue.execute()
 
-    print('\nUndo last operation')
+    print("\nUndo last operation")
     queue.undo()
 
-    print('\nShow history')
+    print("\nShow history")
     queue.history()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

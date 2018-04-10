@@ -14,17 +14,18 @@ class Book:
         self.__dict__.update(kwargs)
 
     def __str__(self):
-        mylist=[]
+        mylist = []
         ordered = OrderedDict(sorted(self.__dict__.items()))
         for i in ordered.keys():
-            mylist.append('{}: {}'.format(i, ordered[i]))
-            if i == 'price':
-                mylist.append('$')
-            mylist.append('\n')
-        return ''.join(mylist)
+            mylist.append("{}: {}".format(i, ordered[i]))
+            if i == "price":
+                mylist.append("$")
+            mylist.append("\n")
+        return "".join(mylist)
 
 
 class Prototype:
+
     def __init__(self):
         self.objects = dict()
 
@@ -37,7 +38,8 @@ class Prototype:
     def clone(self, identifier, **attr):
         found = self.objects.get(identifier)
         if not found:
-            raise ValueError('Incorrect object identifier: {}'.format(identifier))
+            raise ValueError("Incorrect object identifier: {}".format(identifier))
+
         obj = copy.deepcopy(found)
         obj.__dict__.update(attr)
         return obj
@@ -45,30 +47,32 @@ class Prototype:
 
 def main():
     b1 = Book(
-        name='The C Programming Language',
-        authors=('Brian W. Kernighan', 'Dennis M.Ritchie'),
+        name="The C Programming Language",
+        authors=("Brian W. Kernighan", "Dennis M.Ritchie"),
         price=118,
-        publisher='Prentice Hall',
+        publisher="Prentice Hall",
         length=228,
-        publication_date='1978-02-22',
-        tags=('C', 'programming', 'algorithms', 'data structures')
+        publication_date="1978-02-22",
+        tags=("C", "programming", "algorithms", "data structures"),
     )
 
     prototype = Prototype()
-    cid = 'k&r-first'
+    cid = "k&r-first"
     prototype.register(cid, b1)
     b2 = prototype.clone(
         cid,
-        name='The C Programming Language (ANSI)',
+        name="The C Programming Language (ANSI)",
         price=48.99,
         length=274,
-        publication_date='1988-04-01',
-        edition=2)
+        publication_date="1988-04-01",
+        edition=2,
+    )
 
     for i in (b1, b2):
         print(i)
 
     print("ID b1 : {} != ID b2 : {}".format(id(b1), id(b2)))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

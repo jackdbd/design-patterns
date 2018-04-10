@@ -11,18 +11,21 @@ class _Bike(object):
 
 
 def factory_method(product_type):
-    if product_type == 'car':
+    if product_type == "car":
         return _Car()
-    elif product_type == 'bike':
+
+    elif product_type == "bike":
         return _Bike()
+
     else:
-        raise ValueError('Cannot make: {}'.format(product_type))
+        raise ValueError("Cannot make: {}".format(product_type))
 
 
 def main():
-    for product_type in ('car', 'bike'):
+    for product_type in ("car", "bike"):
         product = factory_method(product_type)
         print(str(product))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

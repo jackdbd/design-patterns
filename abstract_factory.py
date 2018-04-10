@@ -14,6 +14,7 @@ class PolygonFactory(ABC):
     subclass of PolygonFactory should implement the "products" method and keep
     it abstract, so even that subclass can't be instatiated.
     """
+
     @classmethod
     @abstractmethod
     def products(cls):
@@ -52,24 +53,25 @@ class PolygonFactory(ABC):
     @classmethod
     @abstractmethod
     def color(cls):
-        return 'black'
+        return "black"
 
 
 class TriangleFactory(PolygonFactory):
     """Abstract Factory class for making triangles."""
+
     @classmethod
     @abstractmethod
     def products(cls):
-        return tuple(
-            ['_TriangleEquilateral', '_TriangleIsosceles', '_TriangleScalene'])
+        return tuple(["_TriangleEquilateral", "_TriangleIsosceles", "_TriangleScalene"])
 
 
 class QuadrilateralFactory(PolygonFactory):
     """Abstract Factory class for making quadrilaterals."""
+
     @classmethod
     @abstractmethod
     def products(cls):
-        return tuple(['_Square', '_Rectangle', '_ConvexQuadrilateral'])
+        return tuple(["_Square", "_Rectangle", "_ConvexQuadrilateral"])
 
 
 class _Polygon(ABC):
@@ -80,14 +82,19 @@ class _Polygon(ABC):
     A _Polygon subclass MUST override ALL _Polygon's abstract methods, otherwise
     a TypeError will be raised as soon as we try to instantiate that subclass.
     """
+
     def __init__(self, factory_name=None):
-        self._color = 'black'
+        self._color = "black"
         self._manufactured = factory_name
 
     def __str__(self):
-        return '{} {} manufactured by {} (perimeter: {}; area: {})'\
-            .format(self.color, self.__class__.__name__, self.manufactured,
-                    self.perimeter, self.area)
+        return "{} {} manufactured by {} (perimeter: {}; area: {})".format(
+            self.color,
+            self.__class__.__name__,
+            self.manufactured,
+            self.perimeter,
+            self.area,
+        )
 
     @property
     @abstractmethod
@@ -126,29 +133,29 @@ class _Triangle(_Polygon):
 
     @property
     def family(self):
-        return 'Triangles'
+        return "Triangles"
 
     @property
     def perimeter(self):
-        return 'a+b+c'
+        return "a+b+c"
 
     @property
     def area(self):
-        return 'base*height/2'
+        return "base*height/2"
 
 
 class _TriangleEquilateral(_Triangle):
 
     @property
     def perimeter(self):
-        return '3a'
+        return "3a"
 
 
 class _TriangleIsosceles(_Triangle):
 
     @property
     def perimeter(self):
-        return '2a+b'
+        return "2a+b"
 
 
 class _TriangleScalene(_Triangle):
@@ -160,37 +167,37 @@ class _Quadrilateral(_Polygon):
 
     @property
     def family(self):
-        return 'Quadrilaterals'
+        return "Quadrilaterals"
 
     @property
     def perimeter(self):
-        return 'a+b+c+d'
+        return "a+b+c+d"
 
     @property
     def area(self):
-        return 'Bretschneider\'s formula'
+        return "Bretschneider's formula"
 
 
 class _Square(_Quadrilateral):
 
     @property
     def perimeter(self):
-        return '4a'
+        return "4a"
 
     @property
     def area(self):
-        return 'a*a'
+        return "a*a"
 
 
 class _Rectangle(_Quadrilateral):
 
     @property
     def perimeter(self):
-        return '2a+2b'
+        return "2a+2b"
 
     @property
     def area(self):
-        return 'base*height'
+        return "base*height"
 
 
 class _ConvexQuadrilateral(_Quadrilateral):
@@ -212,7 +219,7 @@ def give_me_some_polygons(factories, color=None):
     products : list
         a list of objects manufactured by the Factory classes specified
     """
-    if not hasattr(factories, '__len__'):
+    if not hasattr(factories, "__len__"):
         factories = [factories]
 
     products = list()
@@ -231,34 +238,36 @@ def print_polygon(polygon, show_repr=False, show_hierarchy=False):
         print(repr(polygon))
     if show_hierarchy:
         print(inspect.getmro(polygon.__class__))
-        print('\n')
+        print("\n")
 
 
 def main():
     print("Let's start with something simple: some triangles")
     triangles = give_me_some_polygons(TriangleFactory)
-    print('{} triangles'.format(len(triangles)))
+    print("{} triangles".format(len(triangles)))
     for triangle in triangles:
         print_polygon(triangle)
 
     print("\nuse a different factory and add a color")
-    quadrilaterals = give_me_some_polygons(QuadrilateralFactory, color='blue')
-    print('{} quadrilaterals'.format(len(quadrilaterals)))
+    quadrilaterals = give_me_some_polygons(QuadrilateralFactory, color="blue")
+    print("{} quadrilaterals".format(len(quadrilaterals)))
     for quadrilateral in quadrilaterals:
         print_polygon(quadrilateral)
 
     print("\nand now a mix of everything. And all in red!")
     factories = [TriangleFactory, QuadrilateralFactory]
-    polygons = give_me_some_polygons(factories, color='red')
-    print('{} polygons'.format(len(polygons)))
+    polygons = give_me_some_polygons(factories, color="red")
+    print("{} polygons".format(len(polygons)))
     for polygon in polygons:
         print_polygon(polygon)
 
-    print('we can still instantiate directly any subclass of _Polygon (but we '
-          'shouldn\'t because they are private)')
+    print(
+        "we can still instantiate directly any subclass of _Polygon (but we "
+        "shouldn't because they are private)"
+    )
     print_polygon(_Square())
-    print('we can\'t instantiate _Polygon because it has abstract methods.')
+    print("we can't instantiate _Polygon because it has abstract methods.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -7,6 +7,8 @@ This pattern can be implemented with an OBJECT approach or a CLASS approach.
 
 
 # Client
+
+
 class Smartphone(object):
 
     max_input_voltage = 5
@@ -24,6 +26,8 @@ class Smartphone(object):
 
 
 # Supplier
+
+
 class Socket(object):
     output_voltage = None
 
@@ -57,6 +61,7 @@ class USAdapter(object):
 # Approach B: CLASS Adapter. Adapt the Client through multiple inheritance.
 ################################################################################
 
+
 class CannotTransformVoltage(Exception):
     """Exception raised by the SmartphoneAdapter.
 
@@ -71,11 +76,13 @@ class SmartphoneAdapter(Smartphone, Socket):
     def transform_voltage(cls, input_voltage):
         if input_voltage == cls.output_voltage:
             return cls.max_input_voltage
+
         else:
             raise CannotTransformVoltage(
-                "Can\'t transform {0}-{1}V. This adapter transforms {2}-{1}V."
-                .format(input_voltage, cls.max_input_voltage,
-                        cls.output_voltage))
+                "Can\'t transform {0}-{1}V. This adapter transforms {2}-{1}V.".format(
+                    input_voltage, cls.max_input_voltage, cls.output_voltage
+                )
+            )
 
     @classmethod
     def charge(cls, input_voltage):
@@ -102,24 +109,25 @@ class SmartphoneUSAdapter(SmartphoneAdapter, USSocket):
 
 def main():
 
-    print('Smartphone without adapter')
+    print("Smartphone without adapter")
     smartphone = Smartphone()
     smartphone.charge(EUSocket.output_voltage)
     smartphone.charge(USSocket.output_voltage)
 
-    print('\nSmartphone with EU adapter (object adapter approach)')
+    print("\nSmartphone with EU adapter (object adapter approach)")
     smartphone.charge(EUAdapter.output_voltage)
-    print('\nSmartphone with US adapter (object adapter approach)')
+    print("\nSmartphone with US adapter (object adapter approach)")
     smartphone.charge(USAdapter.output_voltage)
 
-    print('\nSmartphone with EU adapter (class adapter approach)')
+    print("\nSmartphone with EU adapter (class adapter approach)")
     smarthone_with_eu_adapter = SmartphoneEUAdapter()
     smarthone_with_eu_adapter.charge(EUSocket.output_voltage)
     smarthone_with_eu_adapter.charge(USSocket.output_voltage)
-    print('\nSmartphone with US adapter (class adapter approach)')
+    print("\nSmartphone with US adapter (class adapter approach)")
     smarthone_with_us_adapter = SmartphoneUSAdapter()
     smarthone_with_us_adapter.charge(EUSocket.output_voltage)
     smarthone_with_us_adapter.charge(USSocket.output_voltage)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

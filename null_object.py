@@ -9,16 +9,16 @@ class RealObject(object):
         self.name = name
 
     def __call__(self, *args, **kwargs):
-        return print('Called with args {} and kwargs {}'.format(args, kwargs))
+        return print("Called with args {} and kwargs {}".format(args, kwargs))
 
     def is_null(self):
         return False
 
     def do_stuff(self):
-        print('do some real stuff')
+        print("do some real stuff")
 
     def get_stuff(self):
-        return 'some real stuff'
+        return "some real stuff"
 
 
 class NullObject(RealObject):
@@ -30,10 +30,10 @@ class NullObject(RealObject):
         return self
 
     def __repr__(self):
-        return '<Null>'
+        return "<Null>"
 
     def __str__(self):
-        return 'Null'
+        return "Null"
 
     def __getattr__(self, attr_name):
         return self
@@ -57,39 +57,39 @@ class NullObject(RealObject):
 def give_me_an_object(name):
     num = random.random()
     cls = RealObject if num > 0.5 else NullObject
-    print('Class: {}'.format(cls.__name__))
-    print('__init__')
+    print("Class: {}".format(cls.__name__))
+    print("__init__")
     return cls(name)
 
 
 def main():
-    name = 'Bob'
+    name = "Bob"
 
     # instatiation and representation
     obj = give_me_an_object(name)
-    print('__str__')
+    print("__str__")
     print(obj)
     print(repr(obj))
 
     # attribute handling
-    print('__getattr__ ')
+    print("__getattr__ ")
     print(obj.name)
-    print('__setattr__')
-    obj.name = 'John'
+    print("__setattr__")
+    obj.name = "John"
     print(obj.name)
-    print('__delattr__')
+    print("__delattr__")
     del obj.name
 
     # object calling
-    print('__call__')
-    obj('hello', 123, some_key=456)
+    print("__call__")
+    obj("hello", 123, some_key=456)
 
     # methods for this particular example
-    print('do_stuff')
+    print("do_stuff")
     obj.do_stuff()
     my_stuff = obj.get_stuff()
     print(my_stuff)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

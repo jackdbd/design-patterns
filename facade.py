@@ -5,6 +5,8 @@ complexity facing inwards if it makes the external interface simpler.
 
 
 # Complex parts
+
+
 class _IgnitionSystem(object):
 
     @staticmethod
@@ -25,6 +27,7 @@ class _Engine(object):
 
 
 class _FuelTank(object):
+
     def __init__(self, level=30):
         self._level = level
 
@@ -55,9 +58,9 @@ class _DashBoardLight(object):
 
     def status_check(self):
         if self._is_on:
-            print('{}: ON'.format(str(self)))
+            print("{}: ON".format(str(self)))
         else:
-            print('{}: OFF'.format(str(self)))
+            print("{}: OFF".format(str(self)))
 
 
 class _HandBrakeLight(_DashBoardLight):
@@ -71,7 +74,7 @@ class _FogLampLight(_DashBoardLight):
 class _Dashboard(object):
 
     def __init__(self):
-        self.lights = {'handbreak': _HandBrakeLight(), 'fog': _FogLampLight()}
+        self.lights = {"handbreak": _HandBrakeLight(), "fog": _FogLampLight()}
 
     def show(self):
         for light in self.lights.values():
@@ -79,7 +82,10 @@ class _Dashboard(object):
 
 
 # Facade
+
+
 class Car(object):
+
     def __init__(self):
         self.ignition_system = _IgnitionSystem()
         self.engine = _Engine()
@@ -95,55 +101,58 @@ class Car(object):
         self.fuel_tank.level -= litres
 
     def start(self):
-        print('\nStarting...')
+        print("\nStarting...")
         self.dashboard.show()
         if self.ignition_system.produce_spark():
             self.engine.turnon()
         else:
-            print('Can\'t start. Faulty ignition system')
+            print("Can't start. Faulty ignition system")
 
     def has_enough_fuel(self, km, km_per_litre):
         litres_needed = km / km_per_litre
         if self.fuel_tank.level > litres_needed:
             return True
+
         else:
             return False
 
     def drive(self, km=100):
-        print('\n')
+        print("\n")
         if self.engine.revs_per_minute > 0:
             while self.has_enough_fuel(km, self.km_per_litre):
                 self.consume_fuel(km)
-                print('Drove {}km'.format(km))
-                print('{:.2f}l of fuel still left'.format(self.fuel_tank.level))
+                print("Drove {}km".format(km))
+                print("{:.2f}l of fuel still left".format(self.fuel_tank.level))
         else:
-            print('Can\'t drive. The Engine is turned off!')
+            print("Can't drive. The Engine is turned off!")
 
     def park(self):
-        print('\nParking...')
-        self.dashboard.lights['handbreak'].is_on = True
+        print("\nParking...")
+        self.dashboard.lights["handbreak"].is_on = True
         self.dashboard.show()
         self.engine.turnoff()
 
     def switch_fog_lights(self, status):
-        print('\nSwitching {} fog lights...'.format(status))
-        boolean = True if status == 'ON' else False
-        self.dashboard.lights['fog'].is_on = boolean
+        print("\nSwitching {} fog lights...".format(status))
+        boolean = True if status == "ON" else False
+        self.dashboard.lights["fog"].is_on = boolean
         self.dashboard.show()
 
     def fill_up_tank(self):
-        print('\nFuel tank filled up!')
+        print("\nFuel tank filled up!")
         self.fuel_tank.level = 100
 
 
 # the main function is the Client
+
+
 def main():
     car = Car()
     car.start()
     car.drive()
 
-    car.switch_fog_lights('ON')
-    car.switch_fog_lights('OFF')
+    car.switch_fog_lights("ON")
+    car.switch_fog_lights("OFF")
 
     car.park()
     car.fill_up_tank()
@@ -152,5 +161,6 @@ def main():
     car.start()
     car.drive()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

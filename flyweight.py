@@ -69,12 +69,12 @@ class Factory(ABC):
             if obj is None:
                 obj = object.__new__(imm)
                 cls.pool[immutable_name] = obj
-                print('NEW IMMUTABLE in the pool: {}'.format(immutable_name))
+                print("NEW IMMUTABLE in the pool: {}".format(immutable_name))
 
         return enemy_class(position=position)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ork_model_identities = list()
     alien_model_identities = list()
     intelligence_identities = list()
@@ -82,33 +82,32 @@ if __name__ == '__main__':
 
     for i in range(10):
         x, y = (random.randint(0, 100), random.randint(0, 100))
-        enemy = Factory.make_enemy('Ork', position=(x, y))
+        enemy = Factory.make_enemy("Ork", position=(x, y))
         ork_model_identities.append(id(enemy.immutables[0]))
         intelligence_identities.append(id(enemy.immutables[1]))
         print(enemy)
 
-    print('')
+    print("")
     for i in range(10):
         x, y = (random.randint(0, 100), random.randint(0, 100))
-        enemy = Factory.make_enemy('Alien', position=(x, y))
+        enemy = Factory.make_enemy("Alien", position=(x, y))
         alien_model_identities.append(id(enemy.immutables[0]))
         intelligence_identities.append(id(enemy.immutables[1]))
         print(enemy)
 
-    print('')
+    print("")
     for i in range(2):
         x, y = (random.randint(0, 100), random.randint(0, 100))
-        enemy = Factory.make_enemy('Queen', position=(x, y))
+        enemy = Factory.make_enemy("Queen", position=(x, y))
         alien_model_identities.append(id(enemy.immutables[0]))
         high_intelligence_identities.append(id(enemy.immutables[1]))
         print(enemy)
 
-    print('\nImmutable parts of the same type share the same identity')
-    print('ork_model_identities:\n{}'.format(set(ork_model_identities)))
-    print('alien_model_identities:\n{}'.format(set(alien_model_identities)))
-    print('intelligence_identities:\n{}'.format(set(intelligence_identities)))
-    print('high_intelligence_identities:\n{}'
-          .format(set(high_intelligence_identities)))
+    print("\nImmutable parts of the same type share the same identity")
+    print("ork_model_identities:\n{}".format(set(ork_model_identities)))
+    print("alien_model_identities:\n{}".format(set(alien_model_identities)))
+    print("intelligence_identities:\n{}".format(set(intelligence_identities)))
+    print("high_intelligence_identities:\n{}".format(set(high_intelligence_identities)))
     assert len(set(ork_model_identities)) == 1
     assert len(set(alien_model_identities)) == 1
     assert len(set(intelligence_identities)) == 1

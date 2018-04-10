@@ -43,23 +43,25 @@ class Memento(object):
 # able to undo the change.
 # The Caretaker holds the Memento but cannot change it (Memento is opaque).
 # The Caretaker knows when to save and when to restore the Originator.
+
+
 def main():
     originator = Originator()
-    originator.state = 'State1'
+    originator.state = "State1"
     memento1 = originator.save()
-    originator.state = 'State2'
+    originator.state = "State2"
     memento2 = originator.save()
-    originator.state = 'State3'
-    originator.state = 'State4'
+    originator.state = "State3"
+    originator.state = "State4"
 
     originator.restore(memento1)
-    assert originator.state == 'State1'
+    assert originator.state == "State1"
     print(originator.state)
 
     originator.restore(memento2)
-    assert originator.state == 'State2'
+    assert originator.state == "State2"
     print(originator.state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

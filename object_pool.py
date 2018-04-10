@@ -21,7 +21,7 @@ class PoolMeta(type):
         serialized_args = [str(arg) for arg in args]
         serialized_kwargs = [str(kwargs), cls.__name__]
         serialized_args.extend(serialized_kwargs)
-        return ''.join(serialized_args)
+        return "".join(serialized_args)
 
     @staticmethod
     def delete_instance_func(self):
@@ -31,7 +31,7 @@ class PoolMeta(type):
         ----------
         self : instance of the class that uses this metaclass
         """
-        print('Bye bye instance of class {}!'.format(self.__class__.__name__))
+        print("Bye bye instance of class {}!".format(self.__class__.__name__))
 
     def __init__(cls, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,20 +39,20 @@ class PoolMeta(type):
 
     def __del__(self):
         PoolMeta.delete_instance_func(self)
-        # the same as assigning the following in the metaclass __init__
-        # PoolMeta.__del__ = PoolMeta.delete_instance_func
+
+    # the same as assigning the following in the metaclass __init__
+    # PoolMeta.__del__ = PoolMeta.delete_instance_func
 
     def __call__(cls, *args, **kwargs):
-        print('\nMeta.__call__(cls={}, args={}, kwargs={})'
-              .format(cls, args, kwargs))
+        print("\nMeta.__call__(cls={}, args={}, kwargs={})".format(cls, args, kwargs))
         key = PoolMeta.serialize_arguments(cls, *args, **kwargs)
 
         try:
             instance = PoolMeta.pool[key]
-            print('Found in pool (skip __new__ and __init__)')
+            print("Found in pool (skip __new__ and __init__)")
             del PoolMeta.pool[key]  # remove from pool
         except KeyError:
-            print('Not found in pool')
+            print("Not found in pool")
             instance = super().__call__(*args, **kwargs)
 
         PoolMeta.pool[key] = instance  # insert in pool
@@ -60,42 +60,45 @@ class PoolMeta(type):
 
 
 class A(object, metaclass=PoolMeta):
+
     def __new__(cls, *args, **kwargs):
-        print('A.__new__')
+        print("A.__new__")
         return super().__new__(cls)
 
     def __init__(self, x):
-        print('A.__init__')
+        print("A.__init__")
         self.x = x
 
 
 class B(object, metaclass=PoolMeta):
+
     def __new__(cls, *args, **kwargs):
-        print('B.__new__')
+        print("B.__new__")
         return super().__new__(cls)
 
     def __init__(self, x):
-        print('B.__init__')
+        print("B.__init__")
         self.x = x
 
 
 class C(B):
+
     def __new__(cls, *args, **kwargs):
-        print('C.__new__')
+        print("C.__new__")
         return super().__new__(cls)
 
     def __init__(self, x, y, z=123):
         super().__init__(x)
-        print('C.__init__')
+        print("C.__init__")
         self.x = x
         self.y = y
         self.z = z
 
 
 def print_pool():
-    print('Final state of the Pool (this function was registered with atexit)')
+    print("Final state of the Pool (this function was registered with atexit)")
     pprint.pprint(PoolMeta.pool)
-    print('')
+    print("")
 
 
 def main():
@@ -118,8 +121,8 @@ def main():
     assert type(C) == PoolMeta
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     atexit.register(print_pool)
     main()
-    print('')
+    print("")
     print(A.__del__.__doc__)
