@@ -36,5 +36,5 @@ six==1.10.0
 SQLAlchemy==1.2.6
 toolz==0.8.2
 tox==2.6.0
-transitions==0.4.3
+transitions==0.6.4
 virtualenv==15.2.0
