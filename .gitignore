@@ -1,20 +1,23 @@
-# ignore python virtual environment
+# python virtual environment
 venv/
 
-# ignore PyCharm project config files and autocompletion
+# PyCharm project config files and autocompletion
 /.idea/*
 
 .vscode/
 
-# ignore compiled bytecode of Python source files
+# compiled bytecode of Python source files
 *.pyc
  __pycache__
 
-# ignore log files
+# log files
 *.log
 
-# ignore database files
+# database files
 *.db
 
-# ignore some OS generated files
+# some OS generated files
 .DS_Store
+
+# tests
+.pytest_cache/
