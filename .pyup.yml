@@ -1,0 +1,25 @@
+# See documentation here: https://pyup.io/docs/bot/config/
+
+# configure updates globally
+# default: all
+# allowed: all, insecure, False
+update: all
+
+# configure dependency pinning globally
+# default: True
+# allowed: True, False
+pin: True
+
+# set the default branch
+# default: empty, the default branch on GitHub
+branch: master
+
+# update schedule
+# default: empty
+# allowed: "every day", "every week", ..
+schedule: "every week"
+
+# search for requirement files
+# default: True
+# allowed: True, False
+search: True
