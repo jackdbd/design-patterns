@@ -2,7 +2,7 @@ alembic==0.9.9
 antiorm==1.2.1
 appdirs==1.4.3
 attrs==17.4.0
-banal==0.3.3
+banal==0.3.5
 black==18.4a0
 boto3==1.7.4
 botocore==1.10.3
