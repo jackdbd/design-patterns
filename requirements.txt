@@ -5,7 +5,7 @@ atomicwrites==1.1.5
 attrs==18.1.0
 banal==0.3.7
 black==18.5b1
-boto3==1.7.28
+boto3==1.7.31
 botocore==1.10.28
 certifi==2018.4.16
 chardet==3.0.4
