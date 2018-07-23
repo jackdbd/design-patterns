@@ -18,7 +18,7 @@ db-sqlite3==0.0.1
 ddt==1.2.0
 docutils==0.14
 funcsigs==1.0.2
-idna==2.6
+idna==2.7
 jmespath==0.9.3
 Mako==1.0.7
 MarkupSafe==1.0
