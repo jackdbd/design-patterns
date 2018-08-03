@@ -60,7 +60,6 @@ class PoolMeta(type):
 
 
 class A(object, metaclass=PoolMeta):
-
     def __new__(cls, *args, **kwargs):
         print("A.__new__")
         return super().__new__(cls)
@@ -71,7 +70,6 @@ class A(object, metaclass=PoolMeta):
 
 
 class B(object, metaclass=PoolMeta):
-
     def __new__(cls, *args, **kwargs):
         print("B.__new__")
         return super().__new__(cls)
@@ -82,7 +80,6 @@ class B(object, metaclass=PoolMeta):
 
 
 class C(B):
-
     def __new__(cls, *args, **kwargs):
         print("C.__new__")
         return super().__new__(cls)

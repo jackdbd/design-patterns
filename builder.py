@@ -24,6 +24,7 @@ class IceCream(ABC):
 
 class ConeIceCream(IceCream):
     """Concrete Product 1."""
+
     pass
 
 
@@ -113,9 +114,9 @@ class Director(object):
         -------
         ConeIceCream or CupIceCream
         """
-        return self.builder.set_flavors(
-            flavors
-        ).set_toppings().add_spoon().get_product()
+        return (
+            self.builder.set_flavors(flavors).set_toppings().add_spoon().get_product()
+        )
 
 
 # Client: it creates a Director object and configures it with a Builder object.

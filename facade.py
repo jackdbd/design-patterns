@@ -8,14 +8,12 @@ complexity facing inwards if it makes the external interface simpler.
 
 
 class _IgnitionSystem(object):
-
     @staticmethod
     def produce_spark():
         return True
 
 
 class _Engine(object):
-
     def __init__(self):
         self.revs_per_minute = 0
 
@@ -27,7 +25,6 @@ class _Engine(object):
 
 
 class _FuelTank(object):
-
     def __init__(self, level=30):
         self._level = level
 
@@ -41,7 +38,6 @@ class _FuelTank(object):
 
 
 class _DashBoardLight(object):
-
     def __init__(self, is_on=False):
         self._is_on = is_on
 
@@ -72,7 +68,6 @@ class _FogLampLight(_DashBoardLight):
 
 
 class _Dashboard(object):
-
     def __init__(self):
         self.lights = {"handbreak": _HandBrakeLight(), "fog": _FogLampLight()}
 
@@ -85,7 +80,6 @@ class _Dashboard(object):
 
 
 class Car(object):
-
     def __init__(self):
         self.ignition_system = _IgnitionSystem()
         self.engine = _Engine()

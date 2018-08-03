@@ -5,7 +5,6 @@ import time
 
 
 class ControlTower(object):
-
     def __init__(self):
         self.available_runways = list()
         self.engaged_runways = list()
@@ -38,7 +37,6 @@ class ControlTower(object):
 
 
 class Airplane(object):
-
     def __init__(self):
         self.control_tower = None
 
@@ -64,7 +62,6 @@ class Airplane(object):
 
 
 class Runway(object):
-
     def register(self, control_tower):
         print("A runway has been registered with the control tower")
         control_tower.available_runways.append(self)

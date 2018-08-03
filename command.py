@@ -25,7 +25,6 @@ def move_command(x, source, dest, *args, **kwargs):
 
 
 class Queue(object):
-
     def __init__(self):
         self._commands = list()
         self._history = list()

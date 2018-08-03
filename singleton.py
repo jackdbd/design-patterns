@@ -12,13 +12,11 @@ class Singleton(object):
 
 
 class Child(Singleton):
-
     def childmethod(self):
         pass
 
 
 class GrandChild(Child):
-
     def grandchildmethod(self):
         pass
 

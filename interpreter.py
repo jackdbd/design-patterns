@@ -15,7 +15,6 @@ class IncorrectAction(Exception):
 
 
 class Device(object):
-
     def __call__(self, *args):
         action = args[0]
         try:
@@ -54,7 +53,6 @@ class Device(object):
 
 
 class Garage(Device):
-
     def __init__(self):
         self.is_open = False
 
@@ -68,7 +66,6 @@ class Garage(Device):
 
 
 class Boiler(Device):
-
     def __init__(self):
         self.temperature = 83
 
@@ -82,7 +79,6 @@ class Boiler(Device):
 
 
 class Television(Device):
-
     def __init__(self):
         self.is_on = False
 

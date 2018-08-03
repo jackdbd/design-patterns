@@ -4,7 +4,6 @@ import random
 
 
 class RealObject(object):
-
     def __init__(self, name):
         self.name = name
 
@@ -22,7 +21,6 @@ class RealObject(object):
 
 
 class NullObject(RealObject):
-
     def __init__(self, *args, **kwargs):
         pass
 

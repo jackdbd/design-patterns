@@ -50,7 +50,6 @@ class Model(object):
 
 
 class ModelBasic(Model):
-
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
@@ -76,7 +75,6 @@ class ModelBasic(Model):
 
 
 class ModelSQLite(Model):
-
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x
@@ -114,7 +112,6 @@ class ModelSQLite(Model):
 
 
 class ModelDataset(Model):
-
     def __init__(self, application_items):
         # super().__init__()  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__()  # also ok in Python 2.x

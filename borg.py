@@ -40,6 +40,7 @@ class ChildNotShare(Borg):
     instances of Borg or any of Borg's subclass. That's because we override
     _shared_state = {}.
     """
+
     _shared_state = {}
 
     def __init__(self, name=None, age=None):

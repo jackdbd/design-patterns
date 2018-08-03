@@ -11,7 +11,6 @@ import types
 
 
 class Strategy(object):
-
     def __init__(self, func=None):
 
         if func is not None:

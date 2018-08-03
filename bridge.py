@@ -18,7 +18,6 @@ from abc import ABC, abstractmethod
 
 
 class Website(ABC):
-
     def __init__(self, implementation):
         # encapsulate an instance of a concrete implementation class
         self._implementation = implementation
@@ -37,7 +36,6 @@ class Website(ABC):
 
 
 class FreeWebsite(Website):
-
     def show_page(self):
         ads = self._implementation.get_ads()
         text = self._implementation.get_excerpt()
@@ -52,7 +50,6 @@ class FreeWebsite(Website):
 
 
 class PaidWebsite(Website):
-
     def show_page(self):
         text = self._implementation.get_article()
         print(text)
@@ -63,7 +60,6 @@ class PaidWebsite(Website):
 
 
 class Implementation(ABC):
-
     def get_excerpt(self):
         return "excerpt from the article"
 
@@ -82,7 +78,6 @@ class Implementation(ABC):
 
 
 class ImplementationA(Implementation):
-
     def get_call_to_action(self):
         return "Pay 10 $ a month to remove ads"
 
@@ -91,7 +86,6 @@ class ImplementationA(Implementation):
 
 
 class ImplementationB(Implementation):
-
     def get_call_to_action(self):
         return "Remove ads with just 10 $ a month"
 

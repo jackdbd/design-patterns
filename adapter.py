@@ -47,12 +47,14 @@ class USSocket(Socket):
 
 class EUAdapter(object):
     """EUAdapter encapsulates client (Smartphone) and supplier (EUSocket)."""
+
     input_voltage = EUSocket.output_voltage
     output_voltage = Smartphone.max_input_voltage
 
 
 class USAdapter(object):
     """USAdapter encapsulates client (Smartphone) and supplier (USSocket)."""
+
     input_voltage = USSocket.output_voltage
     output_voltage = Smartphone.max_input_voltage
 
@@ -67,11 +69,11 @@ class CannotTransformVoltage(Exception):
 
     This exception represents the fact that an adapter could not provide the
     right voltage to the Smartphone if the voltage of the Socket is wrong."""
+
     pass
 
 
 class SmartphoneAdapter(Smartphone, Socket):
-
     @classmethod
     def transform_voltage(cls, input_voltage):
         if input_voltage == cls.output_voltage:
@@ -79,7 +81,7 @@ class SmartphoneAdapter(Smartphone, Socket):
 
         else:
             raise CannotTransformVoltage(
-                "Can\'t transform {0}-{1}V. This adapter transforms {2}-{1}V.".format(
+                "Can't transform {0}-{1}V. This adapter transforms {2}-{1}V.".format(
                     input_voltage, cls.max_input_voltage, cls.output_voltage
                 )
             )
@@ -99,11 +101,13 @@ class SmartphoneEUAdapter(SmartphoneAdapter, EUSocket):
     Note: SmartphoneAdapter already inherited from Smartphone and Socket, but by
     re-inheriting from EUSocket we redefine all the stuff inherited from Socket.
     """
+
     pass
 
 
 class SmartphoneUSAdapter(SmartphoneAdapter, USSocket):
     """System (smartphone + adapter) for an American Socket."""
+
     pass
 
 

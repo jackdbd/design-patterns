@@ -110,8 +110,9 @@ def disconnect_from_db(db=None, conn=None):
 @connect
 def create_table(conn, table_name):
     table_name = scrub(table_name)
-    sql = "CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT," "name TEXT UNIQUE, price REAL, quantity INTEGER)".format(
-        table_name
+    sql = (
+        "CREATE TABLE {} (rowid INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "name TEXT UNIQUE, price REAL, quantity INTEGER)".format(table_name)
     )
     try:
         conn.execute(sql)

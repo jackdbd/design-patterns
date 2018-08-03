@@ -145,14 +145,12 @@ class _Triangle(_Polygon):
 
 
 class _TriangleEquilateral(_Triangle):
-
     @property
     def perimeter(self):
         return "3a"
 
 
 class _TriangleIsosceles(_Triangle):
-
     @property
     def perimeter(self):
         return "2a+b"
@@ -179,7 +177,6 @@ class _Quadrilateral(_Polygon):
 
 
 class _Square(_Quadrilateral):
-
     @property
     def perimeter(self):
         return "4a"
@@ -190,7 +187,6 @@ class _Square(_Quadrilateral):
 
 
 class _Rectangle(_Quadrilateral):
-
     @property
     def perimeter(self):
         return "2a+2b"

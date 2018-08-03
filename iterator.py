@@ -3,7 +3,6 @@
 
 
 class MyIterator(object):
-
     def __init__(self, *args):
         self.data = args
         self.index = 0
@@ -25,10 +24,10 @@ class MyIterator(object):
         return self.data[index]
 
     def __len__(self):
-        return len(self.data[self.index:])
+        return len(self.data[self.index :])
 
     def generator_function(self):
-        for d in self.data[self.index:]:
+        for d in self.data[self.index :]:
             self.index += 1
             yield "Item: {} (type: {})".format(d, type(d))
 

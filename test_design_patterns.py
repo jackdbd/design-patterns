@@ -4,9 +4,18 @@ from io import StringIO
 from ddt import ddt, data
 from contextlib import contextmanager
 from borg import Borg, ChildShare, ChildNotShare
-from interpreter import Interpreter, DeviceNotAvailable, ActionNotAvailable, IncorrectAction
+from interpreter import (
+    Interpreter,
+    DeviceNotAvailable,
+    ActionNotAvailable,
+    IncorrectAction,
+)
 from factory_method import factory_method
-from abstract_factory import TriangleFactory, QuadrilateralFactory, give_me_some_polygons
+from abstract_factory import (
+    TriangleFactory,
+    QuadrilateralFactory,
+    give_me_some_polygons,
+)
 from memento import Originator
 from null_object import NullObject
 from observer import Publisher, Subscriber
@@ -28,7 +37,6 @@ def captured_output():
 
 
 class TestBorg(unittest.TestCase):
-
     def test_two_borgs_have_different_identity(self):
         a = Borg("Mark")
         b = Borg("Luke")
@@ -66,7 +74,6 @@ class TestBorg(unittest.TestCase):
 
 @ddt
 class TestInterpreter(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.interpreter = Interpreter()
@@ -115,7 +122,6 @@ class TestInterpreter(unittest.TestCase):
 
 
 class TestMemento(unittest.TestCase):
-
     def test_restore_state(self):
         originator = Originator()
         originator.state = "State1"
@@ -126,7 +132,6 @@ class TestMemento(unittest.TestCase):
 
 
 class TestNullObject(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.null = NullObject(name="Bob")
@@ -148,13 +153,11 @@ class TestNullObject(unittest.TestCase):
 
 
 class TestFactoryMethod(unittest.TestCase):
-
     def test_factory_cannot_manufacture_a_train(self):
         self.assertRaises(ValueError, factory_method, "train")
 
 
 class TestAbstractFactory(unittest.TestCase):
-
     def test_factories_are_abstract_and_cannot_be_instantiated(self):
         with self.assertRaises(TypeError):
             TriangleFactory()
@@ -175,7 +178,6 @@ class TestAbstractFactory(unittest.TestCase):
 
 
 class TestObserver(unittest.TestCase):
-
     def setUp(self):
         self.newsletters = ["Tech", "Travel", "Fashion"]
         self.pub = Publisher(self.newsletters)
@@ -230,7 +232,6 @@ class TestObserver(unittest.TestCase):
 
 
 class TestProxy(unittest.TestCase):
-
     def test_load_real_or_cached_object(self):
         p1 = Proxy(Implementation("RealObject1"))
 
@@ -248,7 +249,6 @@ class TestProxy(unittest.TestCase):
 
 
 class TestSingleton(unittest.TestCase):
-
     def test_two_singletons_have_same_identity(self):
         s1 = Singleton("Sam")
         s2 = Singleton("Tom")
@@ -271,7 +271,6 @@ class TestSingleton(unittest.TestCase):
 
 
 class TestStrategy(unittest.TestCase):
-
     def test_default_strategy(self):
         self.assertEqual(Strategy().name, "Strategy_default")
 

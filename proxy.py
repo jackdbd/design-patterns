@@ -23,7 +23,6 @@ class CommonInterface(ABC):
 
 
 class Implementation(CommonInterface):
-
     def __init__(self, filename):
         self.filename = filename
 
@@ -35,7 +34,6 @@ class Implementation(CommonInterface):
 
 
 class Proxy(CommonInterface):
-
     def __init__(self, implementation):
         self.__implementation = implementation  # the real object
         self.__cached = False

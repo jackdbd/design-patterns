@@ -34,7 +34,8 @@ class ElementFour(ElementThree):
 class Visitor(object):
 
     operations = {
-        "ElementTwo": "custom_operation", "ElementFour": "another_custom_operation"
+        "ElementTwo": "custom_operation",
+        "ElementFour": "another_custom_operation",
     }
 
     def visit(self, element, *args, **kwargs):

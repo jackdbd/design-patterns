@@ -9,7 +9,6 @@ class CannotHandleRequest(Exception):
 
 
 class Node(ABC):
-
     def __init__(self):
         self._next_node = None
 
@@ -55,7 +54,6 @@ class Node(ABC):
 
 
 class WatcherNode(Node):
-
     def watch(self, request, *args, **kwargs):
         # implement actual behavior here
         string = "Process request {}".format(request)
@@ -67,7 +65,6 @@ class WatcherNode(Node):
 
 
 class BuyerNode(Node):
-
     def buy(self, request, *args, **kwargs):
         # implement actual behavior here
         string = "Process request {}".format(request)
@@ -79,7 +76,6 @@ class BuyerNode(Node):
 
 
 class EaterNode(Node):
-
     def eat(self, request, *args, **kwargs):
         # implement actual behavior here
         string = "Process request {}".format(request)

@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 
 
 class Component(ABC):
-
     def __init__(self, name):
         self.name = name
         self.level = 0
@@ -20,13 +19,11 @@ class Component(ABC):
 
 
 class Leaf(Component):
-
     def traverse(self):
         print("{}{}".format(self.indentation, self.name))
 
 
 class Composite(Component):
-
     def __init__(self, name):
         # super().__init__(name)  # ok in Python 3.x, not in 2.x
         super(self.__class__, self).__init__(name)  # also ok in Python 2.x

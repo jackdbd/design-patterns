@@ -10,7 +10,6 @@ from abc import ABC, abstractmethod
 
 
 class Algorithm(ABC):
-
     def template_method(self):
         """Skeleton of operations to perform. DON'T override me.
 
@@ -43,7 +42,6 @@ class Algorithm(ABC):
 
 
 class AlgorithmA(Algorithm):
-
     def do_step_1(self):
         print("do step 1 for Algorithm A")
 
@@ -52,7 +50,6 @@ class AlgorithmA(Algorithm):
 
 
 class AlgorithmB(Algorithm):
-
     def do_step_1(self):
         print("do step 1 for Algorithm B")
 

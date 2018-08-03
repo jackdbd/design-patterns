@@ -5,7 +5,6 @@ A closure is a record storing a function together with an environment.
 
 
 def outer(x):
-
     def inner(y):
         return x + y
 
@@ -13,7 +12,6 @@ def outer(x):
 
 
 def outer2(x):
-
     def inner2(y, x=x):
         return x + y
 

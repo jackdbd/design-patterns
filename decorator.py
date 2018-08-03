@@ -23,7 +23,6 @@ class Component(object):
 
 
 class ComponentDecorator(object):
-
     def __init__(self, decoratee):
         self._decoratee = decoratee  # reference of the original object
 

@@ -35,7 +35,6 @@ def prototype(hash_function=id, auto_register=False, debug=False):
         instance_pool = dict()
 
         class Decorated(klass):
-
             def __init__(self, *args, **kwargs):
                 """Call __init__ of original class and assign an identifier.
 
@@ -77,7 +76,6 @@ def prototype(hash_function=id, auto_register=False, debug=False):
         Decorated.__name__ = klass.__name__
 
         class ClassObject:
-
             def __repr__(self):
                 return klass.__name__
 
@@ -141,7 +139,6 @@ def prototype(hash_function=id, auto_register=False, debug=False):
 
 @prototype(hash_function=id)
 class Point(object):
-
     def __init__(self, x, y):
         print("{}__init__ (original class)".format(self.__class__.__name__))
         self.x = x

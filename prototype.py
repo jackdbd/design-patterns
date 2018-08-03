@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 
 class Book:
-
     def __init__(self, name, authors, price, **kwargs):
         """Examples of kwargs: publisher, length, tags, publication date"""
         self.name = name
@@ -25,7 +24,6 @@ class Book:
 
 
 class Prototype:
-
     def __init__(self):
         self.objects = dict()
 
