@@ -31,7 +31,7 @@ psycopg2==2.7.5
 py==1.6.0
 pygraphviz==1.5
 pyparsing==2.2.1
-pytest==3.6.4
+pytest==3.8.1
 python-dateutil==2.7.3
 python-editor==1.0.3
 PyYAML==3.13
