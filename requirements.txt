@@ -30,7 +30,7 @@ pluggy==0.8.0
 psycopg2==2.7.5
 py==1.7.0
 pygraphviz==1.5
-pyparsing==2.2.0
+pyparsing==2.2.2
 pytest==3.6.4
 python-dateutil==2.7.3
 python-editor==1.0.3
