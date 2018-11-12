@@ -1,4 +1,4 @@
-alembic==1.0.0
+alembic==1.0.2
 antiorm==1.2.1
 appdirs==1.4.3
 atomicwrites==1.1.5
