@@ -35,7 +35,7 @@ pytest==4.0.1
 python-dateutil==2.7.5
 python-editor==1.0.3
 PyYAML==3.13
-requests==2.19.1
+requests==2.20.1
 s3transfer==0.1.13
 six==1.11.0
 SQLAlchemy==1.2.10
