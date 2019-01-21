@@ -2,7 +2,7 @@ alembic==1.0.6
 antiorm==1.2.1
 appdirs==1.4.3
 atomicwrites==1.2.1
-attrs==18.1.0
+attrs==18.2.0
 banal==0.3.7
 black==18.6b3
 boto3==1.7.65
