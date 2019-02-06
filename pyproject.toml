@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "design-patterns"
+version = "0.1.0"
+description = "Some of the most common design patterns implemented in Python."
+authors = ["Giacomo Debidda <jackdebidda@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+psycopg2 = "^2.7"
+pandas = "^0.24.1"
+pendulum = "^2.0"
+pyparsing = "^2.3"
+alembic = "^1.0"
+sqlalchemy = "^1.2"
+dataset = "^1.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
