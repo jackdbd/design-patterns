@@ -5,14 +5,17 @@ description = "Some of the most common design patterns implemented in Python."
 authors = ["Giacomo Debidda <jackdebidda@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
-psycopg2 = "^2.7"
-pandas = "^0.24.1"
-pendulum = "^2.0"
-pyparsing = "^2.3"
 alembic = "^1.0"
-sqlalchemy = "^1.2"
+boto3 = "^1.9"
+botocore = "^1.12"
 dataset = "^1.1"
+ddt = "^1.2"
+pendulum = "^2.0"
+psycopg2 = "^2.7"
+python = "^3.7"
+pyparsing = "^2.3"
+sqlalchemy = "^1.2"
+transitions = "^0.6.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.2"

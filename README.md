@@ -6,11 +6,19 @@ Some of the most common design patterns implemented in Python.
 
 ## Installation
 
-This project uses [pyenv](https://github.com/pyenv/pyenv) and [poetry](https://poetry.eustace.io/).
+This project uses [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) to manage the Python virtual environment, and [poetry](https://poetry.eustace.io/) to manage the project dependencies.
+
+If you don't have python `3.x.x`, you have to install it. For example, I'm using `3.7.2`.
 
 ```shell
 pyenv install 3.7.2
-pyenv local 3.7.2
+```
+
+Create a virtual environment and activate it.
+
+```shell
+pyenv virtualenv 3.7.2 design_patterns
+pyenv activate design_patterns
 ```
 
 Install all the dependencies from the `poetry.lock` file.
@@ -19,13 +27,12 @@ Install all the dependencies from the `poetry.lock` file.
 poetry install
 ```
 
-
 ## Tests
 
 If you want you can run all tests with:
 
 ```shell
-pytest
+poetry run pytest
 ```
 
 You can also test the MVC pattern with:
