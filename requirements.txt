@@ -12,7 +12,7 @@ chardet==3.0.4
 click==7.0
 codeclimate-test-reporter==0.2.3
 coverage==4.5.2
-dataset==1.1.0
+dataset==1.1.2
 db==0.1.1
 db-sqlite3==0.0.1
 ddt==1.2.0
