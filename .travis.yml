@@ -1,25 +1,21 @@
 os: linux
 dist: xenial
-sudo: required
 branches:
   only:
     - master
 before_install:
   - sudo apt-get update --quiet
   - sudo apt-get install graphviz -y
+  - pip install poetry
 language: python
 python:
   - "3.7"
   - "3.8"
-before_install:
-  - pip install poetry
 install:
   - poetry install -v
-  - pip install tox-travis
 services:
   - postgresql
 script:
-  - tox
   - poetry run pytest --verbose
 notifications:
   email:
