@@ -27,6 +27,18 @@ Install all the dependencies from the `poetry.lock` file.
 poetry install
 ```
 
+## Usage
+
+Every python file contains an implementation of a design pattern and a simple example that can help you understand where the pattern might be useful.
+
+For example
+
+```shell
+python observer.py
+python strategy.py
+# etc...
+```
+
 ## Tests
 
 If you want you can run all tests with:
