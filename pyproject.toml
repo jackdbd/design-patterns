@@ -2,23 +2,27 @@
 name = "design-patterns"
 version = "0.1.0"
 description = "Some of the most common design patterns implemented in Python."
+license = "MIT"
 authors = ["Giacomo Debidda <jackdebidda@gmail.com>"]
+repository = "https://github.com/jackdbd/design-patterns"
+homepage = "https://github.com/jackdbd/design-patterns"
+keywords = ['design-patterns', 'python', 'mvc']
 
 [tool.poetry.dependencies]
-alembic = "^1.0"
-boto3 = "^1.9"
-botocore = "^1.12"
-dataset = "^1.1"
-ddt = "^1.2"
-pendulum = "^2.0"
-psycopg2 = "^2.7"
+alembic = "^1.4.3"
+boto3 = "^1.15.5"
+botocore = "^1.18.5"
+dataset = "^1.3.2"
+ddt = "^1.4.1"
+pendulum = "^2.1.2"
+psycopg2 = "^2.8.6"
+pyparsing = "^2.4.7"
 python = "^3.7"
-pyparsing = "^2.3"
-sqlalchemy = "^1.2"
-transitions = "^0.6.9"
+SQLAlchemy = "^1.3.19"
+transitions = "^0.8.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^4.2"
+pytest = "^6.0.2"
 
 [build-system]
 requires = ["poetry>=0.12"]

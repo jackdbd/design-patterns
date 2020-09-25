@@ -1,23 +1,27 @@
-sudo: required  # see https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments
-dist: trusty
+os: linux
+dist: xenial
+sudo: required
 branches:
   only:
     - master
 before_install:
-  - sudo apt-get update -qq
+  - sudo apt-get update --quiet
   - sudo apt-get install graphviz -y
 language: python
 python:
-  - "3.6"
+  - "3.7"
+  - "3.8"
+before_install:
+  - pip install poetry
 install:
-  - pip install -r requirements.txt
+  - poetry install -v
+  - pip install tox-travis
 services:
   - postgresql
 script:
-  - coverage run -m pytest -v
-after_success:
-  - codecov
+  - tox
+  - poetry run pytest --verbose
 notifications:
-    email:
-        on_success: change
-        on_failure: always
+  email:
+    on_success: change
+    on_failure: always
