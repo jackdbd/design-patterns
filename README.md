@@ -1,8 +1,22 @@
 # design-patterns
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/jackdbd/design-patterns.svg?branch=master)](https://travis-ci.org/jackdbd/design-patterns) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 Some of the most common design patterns implemented in Python.
+
+> :warning: **READ THIS** :warning:
+>
+> *Design patterns are spoonfeed material for brainless programmers incapable of independent thought, who will be resolved to producing code as mediocre as the design patterns they use to create it*.
+>
+> — [Christer Ericson](https://realtimecollisiondetection.net/blog/?p=81), VP of Technology at Activision Central Tech.
+>
+> When I started programming, I thought that a serious programmer should have to know all major design patterns described in the book [Design Patterns: Elements of Reusable Object-Oriented Software](https://en.wikipedia.org/wiki/Design_Patterns), and religiously write code that would follow them.
+>
+> Over time, I realized that only a few of these patterns are actually good, most of them are bad, some others are completely unnecessary, especially in a dynamic language like Python. In fact, I don't recall having to use most of them, except for maybe Decorator, Observer and Strategy.
+>
+> Before reading the code in this repository, I suggest you have a look at these resources to understand whether a particular design pattern suits your use-case or not:
+> - [Design Patterns and Anti-Patterns, Love and Hate](https://www.yegor256.com/2016/02/03/design-patterns-and-anti-patterns.html) — Yegor Bugayenko
+> - [Design Patterns in Dynamic Languages](https://norvig.com/design-patterns/) — Peter Norvig
 
 ## Installation
 
